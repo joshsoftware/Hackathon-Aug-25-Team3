@@ -1,13 +1,17 @@
-import React from 'react'
-import { ConfigurationInitializer } from '../ConfigurationInitializer'
-const layout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div>
-      <ConfigurationInitializer>
-        {children}
-      </ConfigurationInitializer>
-    </div>
-  )
-}
+import { ConfigurationInitializer } from "../ConfigurationInitializer";
+import { SideNav } from "./components/SideNav";
 
-export default layout
+export default function PresentationGeneratorLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex min-h-screen">
+      <SideNav />
+      <div className="flex-1">
+        <ConfigurationInitializer>{children}</ConfigurationInitializer>
+      </div>
+    </div>
+  );
+}

@@ -1,6 +1,9 @@
 import React from "react";
 import * as z from "zod";
-import { ImageSchema, IconSchema } from "@/presentation-templates/defaultSchemes";
+import {
+  ImageSchema,
+  IconSchema,
+} from "@/presentation-templates/defaultSchemes";
 
 export const layoutId = "about-company-slide";
 export const layoutName = "About Our Company Slide";
@@ -16,12 +19,12 @@ const aboutCompanySlideSchema = z.object({
     .min(25)
     .max(400)
     .default(
-      "In the presentation session, the background/introduction can be filled with information that is arranged systematically and effectively with respect to an interesting topic to be used as material for discussion at the opening of the presentation session. The introduction can provide a general overview for those who are listening to your presentation so that the key words on the topic of discussion are emphasized during this background/introductory presentation session.",
+      "In the presentation session, the background/introduction can be filled with information that is arranged systematically and effectively with respect to an interesting topic to be used as material for discussion at the opening of the presentation session. The introduction can provide a general overview for those who are listening to your presentation so that the key words on the topic of discussion are emphasized during this background/introductory presentation session."
     )
     .meta({
       description: "Main content text describing the company or topic",
     }),
-  companyName: z.string().min(2).max(50).default("presenton").meta({
+  companyName: z.string().min(2).max(50).default("PresentAI").meta({
     description: "Company name displayed in header",
   }),
   date: z.string().min(5).max(30).default("June 13, 2038").meta({

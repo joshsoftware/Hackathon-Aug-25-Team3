@@ -8,7 +8,7 @@ export const layoutDescription =
   "A slide layout designed to showcase a company's products or services, highlighting their features and benefits in a structured format.";
 
 const productOverviewSlideSchema = z.object({
-  companyName: z.string().min(2).max(50).default("presenton").meta({
+  companyName: z.string().min(2).max(50).default("PresentAI").meta({
     description: "Company name displayed in header",
   }),
   date: z.string().min(5).max(50).default("June 13, 2038").meta({
@@ -22,7 +22,7 @@ const productOverviewSlideSchema = z.object({
     .min(50)
     .max(400)
     .default(
-      "Provide an explanation of the general profile of the services we have. Arrange information about our products services in a systematic and fact-based manner. Also express our pride in the service that we have done well.",
+      "Provide an explanation of the general profile of the services we have. Arrange information about our products services in a systematic and fact-based manner. Also express our pride in the service that we have done well."
     )
     .meta({
       description: "Main content text describing the product overview",
@@ -42,7 +42,7 @@ const productOverviewSlideSchema = z.object({
         isBlueBackground: z.boolean().default(false).meta({
           description: "Whether the product box has a blue background",
         }),
-      }),
+      })
     )
     .min(2)
     .max(2)
@@ -143,16 +143,28 @@ const ProductOverviewSlideLayout: React.FC<ProductOverviewSlideLayoutProps> = ({
                 >
                   {/* Top Section - Blue background with text */}
                   <div
-                    className={`${products[0].isBlueBackground ? "bg-blue-600" : "bg-gray-100"} p-5 flex flex-col justify-center text-center rounded-t-md`}
+                    className={`${
+                      products[0].isBlueBackground
+                        ? "bg-blue-600"
+                        : "bg-gray-100"
+                    } p-5 flex flex-col justify-center text-center rounded-t-md`}
                     style={{ height: `${TEXT_SECTION_HEIGHT + 32}px` }}
                   >
                     <h2
-                      className={`text-xl font-semibold mb-3 ${products[0].isBlueBackground ? "text-white" : "text-blue-600"}`}
+                      className={`text-xl font-semibold mb-3 ${
+                        products[0].isBlueBackground
+                          ? "text-white"
+                          : "text-blue-600"
+                      }`}
                     >
                       {products[0].title}
                     </h2>
                     <p
-                      className={`text-sm leading-relaxed ${products[0].isBlueBackground ? "text-white" : "text-blue-600"}`}
+                      className={`text-sm leading-relaxed ${
+                        products[0].isBlueBackground
+                          ? "text-white"
+                          : "text-blue-600"
+                      }`}
                     >
                       {products[0].description}
                     </p>
@@ -198,16 +210,28 @@ const ProductOverviewSlideLayout: React.FC<ProductOverviewSlideLayoutProps> = ({
                   </div>
                   {/* Bottom Section - Blue background with text */}
                   <div
-                    className={`${products[1].isBlueBackground ? "bg-blue-600" : "bg-gray-100"} p-5 flex flex-col justify-center text-center rounded-b-md`}
+                    className={`${
+                      products[1].isBlueBackground
+                        ? "bg-blue-600"
+                        : "bg-gray-100"
+                    } p-5 flex flex-col justify-center text-center rounded-b-md`}
                     style={{ height: `${TEXT_SECTION_HEIGHT + 32}px` }}
                   >
                     <h2
-                      className={`text-xl font-semibold mb-3 ${products[1].isBlueBackground ? "text-white" : "text-blue-600"}`}
+                      className={`text-xl font-semibold mb-3 ${
+                        products[1].isBlueBackground
+                          ? "text-white"
+                          : "text-blue-600"
+                      }`}
                     >
                       {products[1].title}
                     </h2>
                     <p
-                      className={`text-sm leading-relaxed ${products[1].isBlueBackground ? "text-white" : "text-blue-600"}`}
+                      className={`text-sm leading-relaxed ${
+                        products[1].isBlueBackground
+                          ? "text-white"
+                          : "text-blue-600"
+                      }`}
                     >
                       {products[1].description}
                     </p>

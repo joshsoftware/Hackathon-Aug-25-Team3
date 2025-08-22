@@ -17,7 +17,7 @@ export const layoutDescription =
   "A business model presentation slide displaying CAC metrics and monetization strategy.";
 
 const businessModelSchema = z.object({
-  companyName: z.string().min(2).max(50).default("presenton").meta({
+  companyName: z.string().min(2).max(50).default("PresentAI").meta({
     description: "Company name displayed in header",
   }),
   date: z.string().min(5).max(50).default("June 13, 2038").meta({
@@ -27,7 +27,7 @@ const businessModelSchema = z.object({
   description: z
     .string()
     .default(
-      "Describe how you monetize, who your customers are, your distribution channels or fee structure. The goal is to give an idea of how this business will sustain your product or service and explain how your company will make money and achieve its goals. This can be shown with graphs, statistics, or charts. Use the Lifetime Value (LTV) and Customer Acquisition Cost (CAC) metrics to provide a clearer picture.",
+      "Describe how you monetize, who your customers are, your distribution channels or fee structure. The goal is to give an idea of how this business will sustain your product or service and explain how your company will make money and achieve its goals. This can be shown with graphs, statistics, or charts. Use the Lifetime Value (LTV) and Customer Acquisition Cost (CAC) metrics to provide a clearer picture."
     )
     .meta({
       description:
@@ -38,7 +38,7 @@ const businessModelSchema = z.object({
       z.object({
         label: z.string().min(3).max(20),
         percentage: z.number().min(0).max(100),
-      }),
+      })
     )
     .min(2)
     .max(5)
