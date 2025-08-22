@@ -2,9 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
-  font-family: var(--font-inter), var(--font-roboto), sans-serif;
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  font-weight: 600;
 }
 
 @layer utilities {
@@ -15,63 +24,62 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --background: 165 40% 98%;
+    --foreground: 170 35% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 170 35% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --popover-foreground: 170 35% 12%;
+    --primary: 170 90% 35%;
+    --primary-foreground: 165 40% 98%;
+    --secondary: 165 30% 92%;
+    --secondary-foreground: 170 35% 12%;
+    --muted: 165 30% 92%;
+    --muted-foreground: 170 20% 40%;
+    --accent: 170 90% 45%;
+    --accent-foreground: 165 40% 98%;
+    --destructive: 0 90% 60%;
+    --destructive-foreground: 165 40% 98%;
+    --border: 165 30% 90%;
+    --input: 165 30% 90%;
+    --ring: 170 90% 35%;
+    --chart-1: 170 90% 35%;
+    --chart-2: 190 85% 40%;
+    --chart-3: 210 80% 45%;
+    --chart-4: 150 75% 40%;
+    --chart-5: 130 70% 35%;
+    --radius: 1rem;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 170 35% 8%;
+    --foreground: 165 40% 98%;
+    --card: 170 35% 10%;
+    --card-foreground: 165 40% 98%;
+    --popover: 170 35% 10%;
+    --popover-foreground: 165 40% 98%;
+    --primary: 170 95% 45%;
+    --primary-foreground: 170 35% 8%;
+    --secondary: 170 35% 15%;
+    --secondary-foreground: 165 40% 98%;
+    --muted: 170 35% 15%;
+    --muted-foreground: 165 30% 75%;
+    --accent: 170 95% 45%;
+    --accent-foreground: 165 40% 98%;
+    --destructive: 0 90% 50%;
+    --destructive-foreground: 165 40% 98%;
+    --border: 170 35% 15%;
+    --input: 170 35% 15%;
+    --ring: 170 95% 45%;
+    --chart-1: 170 95% 45%;
+    --chart-2: 190 90% 50%;
+    --chart-3: 210 85% 55%;
+    --chart-4: 150 80% 50%;
+    --chart-5: 130 75% 45%;
   }
 }
 
 @layer base {
-
   body {
     @apply bg-background text-foreground;
   }
@@ -80,8 +88,6 @@ body {
 strong {
   @apply font-black;
 }
-
-
 
 ::selection {
   background-color: hsl(var(--chart-1));
@@ -108,8 +114,8 @@ tbody tr {
 }
 
 thead {
-  width: calc(100% - 1em)
-    /* scrollbar is average 1em/16px width, remove it from thead width */
+  width: calc(100% - 1em);
+  /* scrollbar is average 1em/16px width, remove it from thead width */
 }
 
 /* Add this to your global CSS or a specific CSS module */
@@ -148,7 +154,6 @@ thead {
 }
 
 @keyframes blink {
-
   from,
   to {
     opacity: 1;
@@ -167,7 +172,6 @@ thead {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
 
 .custom_scrollbar::-webkit-scrollbar {
   width: 6px;
@@ -198,7 +202,6 @@ thead {
   scrollbar-width: thin;
   scrollbar-color: #d1d5db #f9fafb;
 }
-
 
 /* word animation */
 
@@ -244,13 +247,17 @@ thead {
 }
 
 .research-mode-bg::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
   width: 0;
   height: 0;
-  background: radial-gradient(circle, rgba(56, 48, 161, 0.1) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(56, 48, 161, 0.1) 0%,
+    transparent 70%
+  );
   transform: translate(-50%, -50%);
   border-radius: 50%;
   animation: rippleEffect 0.6s ease-out forwards;
@@ -409,7 +416,7 @@ thead {
   @apply p-1 rounded hover:bg-gray-100 transition-colors;
 }
 
-.mdxeditor-button[data-active=true] {
+.mdxeditor-button[data-active="true"] {
   @apply bg-gray-100;
 }
 
@@ -449,7 +456,6 @@ thead {
 }
 
 .container__editor {
- 
   font-variant-ligatures: common-ligatures;
   background-color: #fafafa;
   border-radius: 3px;

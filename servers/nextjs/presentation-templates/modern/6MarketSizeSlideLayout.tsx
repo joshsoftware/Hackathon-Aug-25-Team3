@@ -11,7 +11,7 @@ const marketSizeSlideSchema = z.object({
   title: z.string().min(3).max(15).default("Market Size").meta({
     description: "Main slide title",
   }),
-  companyName: z.string().min(2).max(50).default("presenton").meta({
+  companyName: z.string().min(2).max(50).default("PresentAI").meta({
     description: "Company name displayed in header",
   }),
   date: z.string().min(5).max(50).default("June 13, 2038").meta({
@@ -28,7 +28,7 @@ const marketSizeSlideSchema = z.object({
         label: z.string().min(3).max(30),
         value: z.string().min(3).max(30),
         description: z.string().min(3).max(130),
-      }),
+      })
     )
     .min(1)
     .max(3)
@@ -59,7 +59,7 @@ const marketSizeSlideSchema = z.object({
   description: z
     .string()
     .default(
-      "Market size is the total amount of all sales and customers that can be seen directly by stakeholders. This technique is usually calculated at the end of the year, the market size can be used by companies to determine the potential of their market and business in the future. This is very useful, especially for new companies that will offer services to those who are interested in our services.",
+      "Market size is the total amount of all sales and customers that can be seen directly by stakeholders. This technique is usually calculated at the end of the year, the market size can be used by companies to determine the potential of their market and business in the future. This is very useful, especially for new companies that will offer services to those who are interested in our services."
     )
     .meta({
       description: "Main description text for the slide",

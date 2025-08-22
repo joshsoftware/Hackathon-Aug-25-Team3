@@ -1,14 +1,18 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { setCanChangeKeys, setLLMConfig } from '@/store/slices/userConfig';
-import { hasValidLLMConfig } from '@/utils/storeHelpers';
-import { usePathname, useRouter } from 'next/navigation';
-import { useDispatch } from 'react-redux';
-import { checkIfSelectedOllamaModelIsPulled } from '@/utils/providerUtils';
-import { LLMConfig } from '@/types/llm_config';
+import { useEffect, useState } from "react";
+import { setCanChangeKeys, setLLMConfig } from "@/store/slices/userConfig";
+import { hasValidLLMConfig } from "@/utils/storeHelpers";
+import { usePathname, useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { checkIfSelectedOllamaModelIsPulled } from "@/utils/providerUtils";
+import { LLMConfig } from "@/types/llm_config";
 
-export function ConfigurationInitializer({ children }: { children: React.ReactNode }) {
+export function ConfigurationInitializer({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -27,69 +31,74 @@ export function ConfigurationInitializer({ children }: { children: React.ReactNo
         setIsLoading(false);
       }
     }, 500);
-  }
+  };
 
   const fetchUserConfigState = async () => {
     setIsLoading(true);
-    const response = await fetch('/api/can-change-keys');
+    const response = await fetch("/api/can-change-keys");
     const canChangeKeys = (await response.json()).canChange;
     dispatch(setCanChangeKeys(canChangeKeys));
 
     if (canChangeKeys) {
-      const response = await fetch('/api/user-config');
+      const response = await fetch("/api/user-config");
       const llmConfig = await response.json();
       if (!llmConfig.LLM) {
-        llmConfig.LLM = 'openai';
+        llmConfig.LLM = "openai";
       }
       dispatch(setLLMConfig(llmConfig));
       const isValid = hasValidLLMConfig(llmConfig);
       if (isValid) {
         // Check if the selected Ollama model is pulled
-        if (llmConfig.LLM === 'ollama') {
-          const isPulled = await checkIfSelectedOllamaModelIsPulled(llmConfig.OLLAMA_MODEL);
+        if (llmConfig.LLM === "ollama") {
+          const isPulled = await checkIfSelectedOllamaModelIsPulled(
+            llmConfig.OLLAMA_MODEL
+          );
           if (!isPulled) {
-            router.push('/');
-            setLoadingToFalseAfterNavigatingTo('/');
+            router.push("/");
+            setLoadingToFalseAfterNavigatingTo("/");
             return;
           }
         }
-        if (llmConfig.LLM === 'custom') {
-          const isAvailable = await checkIfSelectedCustomModelIsAvailable(llmConfig);
+        if (llmConfig.LLM === "custom") {
+          const isAvailable = await checkIfSelectedCustomModelIsAvailable(
+            llmConfig
+          );
           if (!isAvailable) {
-            router.push('/');
-            setLoadingToFalseAfterNavigatingTo('/');
+            router.push("/");
+            setLoadingToFalseAfterNavigatingTo("/");
             return;
           }
         }
-        if (route === '/') {
-          router.push('/upload');
-          setLoadingToFalseAfterNavigatingTo('/upload');
+        if (route === "/") {
+          router.push("/upload");
+          setLoadingToFalseAfterNavigatingTo("/upload");
         } else {
           setIsLoading(false);
         }
-      } else if (route !== '/') {
-        router.push('/');
-        setLoadingToFalseAfterNavigatingTo('/');
+      } else if (route !== "/") {
+        router.push("/");
+        setLoadingToFalseAfterNavigatingTo("/");
       } else {
         setIsLoading(false);
       }
     } else {
-      if (route === '/') {
-        router.push('/upload');
-        setLoadingToFalseAfterNavigatingTo('/upload');
+      if (route === "/") {
+        router.push("/upload");
+        setLoadingToFalseAfterNavigatingTo("/upload");
       } else {
         setIsLoading(false);
       }
     }
-  }
+  };
 
-
-  const checkIfSelectedCustomModelIsAvailable = async (llmConfig: LLMConfig) => {
+  const checkIfSelectedCustomModelIsAvailable = async (
+    llmConfig: LLMConfig
+  ) => {
     try {
-      const response = await fetch('/api/v1/ppt/openai/models/available', {
-        method: 'POST',
+      const response = await fetch("/api/v1/ppt/openai/models/available", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           url: llmConfig.CUSTOM_LLM_URL,
@@ -99,11 +108,10 @@ export function ConfigurationInitializer({ children }: { children: React.ReactNo
       const data = await response.json();
       return data.includes(llmConfig.CUSTOM_MODEL);
     } catch (error) {
-      console.error('Error fetching custom models:', error);
+      console.error("Error fetching custom models:", error);
       return false;
     }
-  }
-
+  };
 
   if (isLoading) {
     return (
@@ -114,29 +122,26 @@ export function ConfigurationInitializer({ children }: { children: React.ReactNo
             <div className="mb-6">
               <img
                 src="/Logo.png"
-                alt="PresentOn"
+                alt="PresentAI"
                 className="h-12 mx-auto mb-4 opacity-90"
               />
               <div className="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
             </div>
 
-            {/* Loading Text */}
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-gray-800 font-inter">
-                Initializing Application
-              </h3>
-              <p className="text-sm text-gray-600 font-inter">
-                Loading configuration and checking model availability...
-              </p>
+            {/* Loading Animation */}
+            <div className="relative w-16 h-16 mx-auto mb-6">
+              <div className="absolute w-full h-full border-4 border-t-blue-500 border-r-purple-500 border-b-blue-500 border-l-purple-500 rounded-full animate-spin"></div>
+              <div className="absolute w-full h-full border-4 border-blue-200 rounded-full opacity-20"></div>
             </div>
 
-            {/* Progress Indicator */}
-            <div className="mt-6">
-              <div className="flex space-x-1 justify-center">
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-              </div>
+            {/* Loading Text */}
+            <div className="space-y-3">
+              <h3 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Initializing Application
+              </h3>
+              <p className="text-sm text-gray-600 font-inter animate-pulse">
+                Loading configuration and checking model availability...
+              </p>
             </div>
           </div>
         </div>

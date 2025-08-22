@@ -1,6 +1,9 @@
 import React from "react";
 import * as z from "zod";
-import { ImageSchema, IconSchema } from "@/presentation-templates/defaultSchemes";
+import {
+  ImageSchema,
+  IconSchema,
+} from "@/presentation-templates/defaultSchemes";
 
 export const layoutId = "problem-statement-slide";
 export const layoutName = "Problem Statement Slide";
@@ -16,7 +19,7 @@ const problemStatementSlideSchema = z.object({
     .min(50)
     .max(200)
     .default(
-      "A problem needs to be discussed further and in detail because this problem is the main foundation in the initial development of a product, service, and decision making. Without a well-defined problem, it will have an impact on a job that is unfocused, unmanaged, and less relevant.",
+      "A problem needs to be discussed further and in detail because this problem is the main foundation in the initial development of a product, service, and decision making. Without a well-defined problem, it will have an impact on a job that is unfocused, unmanaged, and less relevant."
     )
     .meta({
       description: "Main content text describing the problem statement",
@@ -33,7 +36,7 @@ const problemStatementSlideSchema = z.object({
         icon: IconSchema.optional().meta({
           description: "Optional icon for the problem category",
         }),
-      }),
+      })
     )
     .min(2)
     .max(3)
@@ -43,8 +46,7 @@ const problemStatementSlideSchema = z.object({
         description:
           "Businesses struggle to find digital tools that meet their needs, causing operational slowdowns.",
         icon: {
-          __icon_url__:
-            "/static/icons/placeholder.png",
+          __icon_url__: "/static/icons/placeholder.png",
           __icon_query__: "warning alert inefficiency",
         },
       },
@@ -53,8 +55,7 @@ const problemStatementSlideSchema = z.object({
         description:
           "Outdated systems increase expenses, while small businesses struggle to expand their market reach.",
         icon: {
-          __icon_url__:
-            "/static/icons/placeholder.png",
+          __icon_url__: "/static/icons/placeholder.png",
           __icon_query__: "trending up costs chart",
         },
       },
@@ -63,8 +64,7 @@ const problemStatementSlideSchema = z.object({
         description:
           "Businesses struggle to find digital tools that meet their needs, causing operational slowdowns.",
         icon: {
-          __icon_url__:
-            "/static/icons/placeholder.png",
+          __icon_url__: "/static/icons/placeholder.png",
           __icon_query__: "warning alert inefficiency",
         },
       },
@@ -73,8 +73,7 @@ const problemStatementSlideSchema = z.object({
         description:
           "Businesses struggle to find digital tools that meet their needs, causing operational slowdowns.",
         icon: {
-          __icon_url__:
-            "/static/icons/placeholder.png",
+          __icon_url__: "/static/icons/placeholder.png",
           __icon_query__: "warning alert inefficiency",
         },
       },
@@ -83,7 +82,7 @@ const problemStatementSlideSchema = z.object({
       description:
         "List of problem categories with titles, descriptions, and optional icons",
     }),
-  companyName: z.string().min(2).max(50).default("presenton").meta({
+  companyName: z.string().min(2).max(50).default("PresentAI").meta({
     description: "Company name displayed in header",
   }),
   date: z.string().min(5).max(30).default("June 13, 2038").meta({

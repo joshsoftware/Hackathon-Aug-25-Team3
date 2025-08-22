@@ -8,7 +8,7 @@ export const layoutDescription =
   "A slide layout designed to present a solution to previously identified problems, showcasing key aspects of the solution with sections and icons.";
 
 const solutionSlideSchema = z.object({
-  companyName: z.string().min(2).max(50).default("presenton").meta({
+  companyName: z.string().min(2).max(50).default("PresentAI").meta({
     description: "Company name displayed in header",
   }),
   date: z.string().min(5).max(30).default("June 13, 2038").meta({
@@ -22,7 +22,7 @@ const solutionSlideSchema = z.object({
     .min(20)
     .max(300)
     .default(
-      "Show that we offer a solution that solves the problems previously described and identified. Make sure that the solutions we offer uphold the values of effectiveness, efficiency, and are highly relevant to the market situation and society is here and what is hsd sdksdf klfdslkf lkflkfsldkf.",
+      "Show that we offer a solution that solves the problems previously described and identified. Make sure that the solutions we offer uphold the values of effectiveness, efficiency, and are highly relevant to the market situation and society is here and what is hsd sdksdf klfdslkf lkflkfsldkf."
     )
     .meta({
       description: "Main content text describing the solution",
@@ -39,7 +39,7 @@ const solutionSlideSchema = z.object({
         icon: IconSchema.optional().meta({
           description: "Icon for the section",
         }),
-      }),
+      })
     )
     .min(2)
     .max(3)
@@ -50,8 +50,7 @@ const solutionSlideSchema = z.object({
           "Innovative and widely accepted. Innovative and widely accepted. Innovative and widely accepted.",
         icon: {
           __icon_query__: "market innovation",
-          __icon_url__:
-            "/static/icons/placeholder.png",
+          __icon_url__: "/static/icons/placeholder.png",
         },
       },
       {
@@ -59,8 +58,7 @@ const solutionSlideSchema = z.object({
         description: "Based on sound market decisions.",
         icon: {
           __icon_query__: "industry building",
-          __icon_url__:
-            "/static/icons/placeholder.png",
+          __icon_url__: "/static/icons/placeholder.png",
         },
       },
       {
@@ -68,8 +66,7 @@ const solutionSlideSchema = z.object({
         description: "Driven by precise data and analysis.",
         icon: {
           __icon_query__: "SEM data analysis",
-          __icon_url__:
-            "/static/icons/placeholder.png",
+          __icon_url__: "/static/icons/placeholder.png",
         },
       },
       {
@@ -77,8 +74,7 @@ const solutionSlideSchema = z.object({
         description: "Focused on real user impact.",
         icon: {
           __icon_query__: "end user impact",
-          __icon_url__:
-            "/static/icons/placeholder.png",
+          __icon_url__: "/static/icons/placeholder.png",
         },
       },
     ])

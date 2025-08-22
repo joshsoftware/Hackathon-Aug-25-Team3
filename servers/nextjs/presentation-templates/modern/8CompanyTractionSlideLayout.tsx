@@ -28,7 +28,7 @@ const growthStatsSchema = z
 
 // growthStats: list of dicts, each dict is { year: string, <metric1>: number, <metric2>: number, ... }
 const tractionSchema = z.object({
-  companyName: z.string().min(2).max(50).default("presenton").meta({
+  companyName: z.string().min(2).max(50).default("PresentAI").meta({
     description: "Company name displayed in header",
   }),
   date: z.string().min(5).max(50).default("June 13, 2038").meta({
@@ -42,7 +42,7 @@ const tractionSchema = z.object({
     .min(3)
     .max(200)
     .default(
-      "Traction is a period where the company is feeling momentum during its development period. If traction momentum is not harnessed, sales figures can decline and the customer base can shrink. In general, companies will judge success by the amount of revenue and new customers they receive.",
+      "Traction is a period where the company is feeling momentum during its development period. If traction momentum is not harnessed, sales figures can decline and the customer base can shrink. In general, companies will judge success by the amount of revenue and new customers they receive."
     )
     .meta({
       description:
@@ -131,20 +131,20 @@ const defaultColors = [
 ];
 
 function getSeriesKeys(
-  growthStats: Array<Record<string, string | number>>,
+  growthStats: Array<Record<string, string | number>>
 ): string[] {
   if (!growthStats.length) return [];
   // Exclude 'year' or any non-numeric keys
   const first = growthStats[0];
   return Object.keys(first).filter(
-    (key) => key !== "year" && typeof first[key] === "number",
+    (key) => key !== "year" && typeof first[key] === "number"
   );
 }
 
 // Compute stats for right column, generic for all series
 function computeStats(
   growthStats: Array<Record<string, string | number>>,
-  seriesKeys: string[],
+  seriesKeys: string[]
 ) {
   if (!growthStats.length) return [];
   const first = growthStats[0];
