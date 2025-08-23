@@ -12,6 +12,7 @@ import {
   Settings,
   Layout,
   FilePlus2,
+  FileText,
 } from "lucide-react";
 import { useState } from "react";
 import { trackEvent, MixpanelEvent } from "@/utils/mixpanel";
@@ -30,6 +31,11 @@ export function SideNav() {
       title: "Dashboard",
       href: "/dashboard",
       icon: LayoutDashboard,
+    },
+    {
+      title: "Documents",
+      href: "/documents",
+      icon: FileText,
     },
     {
       title: "Templates",

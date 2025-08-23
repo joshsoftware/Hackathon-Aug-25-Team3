@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/select";
 import { LanguageType, PresentationConfig } from "../type";
 import { useState } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -24,11 +24,13 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 // Types
 interface ConfigurationSelectsProps {
   config: PresentationConfig;
-  onConfigChange: (key: keyof PresentationConfig, value: string) => void;
+  onConfigChange: (key: keyof PresentationConfig, value: string | boolean) => void;
 }
 
 type SlideOption = "5" | "8" | "9" | "10" | "11" | "12" | "13" | "14" | "15" | "16" | "17" | "18" | "19" | "20";
@@ -194,7 +196,26 @@ export function ConfigurationSelects({
   const [openLanguage, setOpenLanguage] = useState(false);
 
   return (
-    <div className="flex flex-wrap order-1 gap-4">
+    <div className="flex flex-wrap order-1 gap-4 items-center">
+      {/* Organization Documents Toggle */}
+      <div className="flex items-center space-x-3 bg-green-50 border border-green-200 rounded-lg px-4 py-2">
+        <FileText className="h-4 w-4 text-green-600" />
+        <div className="flex items-center space-x-2">
+          <Label 
+            htmlFor="use-org-docs" 
+            className="text-sm font-medium text-green-800 cursor-pointer"
+          >
+            Use Organization Documents
+          </Label>
+          <Switch
+            id="use-org-docs"
+            checked={config.useOrgDocuments}
+            onCheckedChange={(checked) => onConfigChange("useOrgDocuments", checked)}
+            data-testid="org-docs-toggle"
+          />
+        </div>
+      </div>
+
       <SlideCountSelect
         value={config.slides}
         onValueChange={(value) => onConfigChange("slides", value)}

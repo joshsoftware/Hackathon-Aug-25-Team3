@@ -47,6 +47,7 @@ const UploadPage = () => {
     slides: "8",
     language: LanguageType.English,
     prompt: "",
+    useOrgDocuments: false,
   });
 
   const [loadingState, setLoadingState] = useState<LoadingState>({
@@ -62,7 +63,7 @@ const UploadPage = () => {
    * @param key - Configuration key to update
    * @param value - New value for the configuration
    */
-  const handleConfigChange = (key: keyof PresentationConfig, value: string) => {
+  const handleConfigChange = (key: keyof PresentationConfig, value: string | boolean) => {
     setConfig((prev) => ({ ...prev, [key]: value }));
   };
 
