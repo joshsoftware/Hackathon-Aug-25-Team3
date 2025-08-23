@@ -11,7 +11,7 @@ from services.database import get_async_session
 # JWT Configuration
 SECRET_KEY = "your-secret-key-keep-it-secret"  # Change this in production!
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 43200  # 30 days
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()

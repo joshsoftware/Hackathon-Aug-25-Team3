@@ -10,9 +10,11 @@ async def get_current_user_id(authorization: Optional[str] = Header(None)) -> st
     This function validates the JWT token and extracts the user_id from the token payload.
     """
     if not authorization:
-        # For development, we'll return a default user_id if no token is provided
-        # In production, this should raise an HTTPException for unauthorized access
-        return "default_user"
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header is missing",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     
     try:
         # Remove 'Bearer ' prefix if present
@@ -32,8 +34,13 @@ async def get_current_user_id(authorization: Optional[str] = Header(None)) -> st
             )
         
         return user_id
-    except JWTError:
-        # For backward compatibility during development, if token validation fails,
-        # fall back to using the token itself as the user_id
-        # In production, this should be removed and only valid JWT tokens should be accepted
-        return authorization.replace("Bearer ", "")
+    except JWTError as e:
+        # Log the error for debugging
+        print(f"JWT Error: {str(e)}")
+        
+        # Raise an exception for invalid tokens
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication token",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
