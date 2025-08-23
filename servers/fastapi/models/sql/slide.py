@@ -6,6 +6,7 @@ from utils.randomizers import get_random_uuid
 
 class SlideModel(SQLModel, table=True):
     id: str = Field(primary_key=True, default_factory=get_random_uuid)
+    user_id: str  # User ID to associate slides with users (required)
     presentation: str
     layout_group: str
     layout: str
@@ -18,6 +19,7 @@ class SlideModel(SQLModel, table=True):
     def get_new_slide(self, presentation_id: str, content: Optional[dict] = None):
         return SlideModel(
             id=get_random_uuid(),
+            user_id=self.user_id,  # Include user_id when creating a new slide
             presentation=presentation_id,
             layout_group=self.layout_group,
             layout=self.layout,

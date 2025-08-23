@@ -2,6 +2,7 @@ import importlib
 from typing import Annotated, Optional
 from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from dependencies.auth import get_current_user_id
 
 from models.sql.presentation import PresentationModel
 from models.sql.slide import SlideModel
@@ -24,10 +25,18 @@ async def edit_slide(
     id: Annotated[str, Body()],
     prompt: Annotated[str, Body()],
     sql_session: AsyncSession = Depends(get_async_session),
+    user_id: str = Depends(get_current_user_id),
 ):
     slide = await sql_session.get(SlideModel, id)
     if not slide:
         raise HTTPException(status_code=404, detail="Slide not found")
+    
+    # Check if the slide belongs to the current user
+    # Update the slide's user_id if it's NULL (for backward compatibility)
+    if not slide.user_id:
+        slide.user_id = user_id
+    elif slide.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You don't have permission to edit this slide")
     presentation = await sql_session.get(PresentationModel, slide.presentation)
     if not presentation:
         raise HTTPException(status_code=404, detail="Presentation not found")
@@ -71,10 +80,17 @@ async def edit_slide_html(
     prompt: Annotated[str, Body()],
     html: Annotated[Optional[str], Body()] = None,
     sql_session: AsyncSession = Depends(get_async_session),
+    user_id: str = Depends(get_current_user_id),
 ):
     slide = await sql_session.get(SlideModel, id)
     if not slide:
         raise HTTPException(status_code=404, detail="Slide not found")
+    
+    # Update the slide's user_id if it's NULL (for backward compatibility)
+    if not slide.user_id:
+        slide.user_id = user_id
+    elif slide.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You don't have permission to edit this slide")
 
     html_to_edit = html or slide.html_content
     if not html_to_edit:

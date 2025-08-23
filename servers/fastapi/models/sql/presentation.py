@@ -11,6 +11,7 @@ from utils.randomizers import get_random_uuid
 
 class PresentationModel(SQLModel, table=True):
     id: str = Field(primary_key=True)
+    user_id: str  # User ID to associate presentations with users (required)
     prompt: str
     n_slides: int
     language: str
@@ -25,6 +26,7 @@ class PresentationModel(SQLModel, table=True):
     def get_new_presentation(self):
         return PresentationModel(
             id=get_random_uuid(),
+            user_id=self.user_id,  # Include user_id when creating a new presentation
             prompt=self.prompt,
             n_slides=self.n_slides,
             language=self.language,
