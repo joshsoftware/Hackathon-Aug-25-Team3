@@ -120,11 +120,9 @@ export function ConfigurationInitializer({
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8 text-center">
             {/* Logo/Branding */}
             <div className="mb-6">
-              <img
-                src="/Logo.png"
-                alt="PresentAI"
-                className="h-12 mx-auto mb-4 opacity-90"
-              />
+               <div className="h-12 flex items-center justify-center mb-4 opacity-90 text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent select-none">
+                PresentAi
+              </div>
               <div className="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
             </div>
 

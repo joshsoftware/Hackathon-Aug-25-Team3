@@ -148,7 +148,7 @@ const Header = ({
           handleExportPdf();
         }}
         variant="ghost"
-        className={`pb-4 border-b rounded-none border-gray-300 w-full flex justify-start text-[#5146E5] ${mobile ? "bg-white py-6 border-none rounded-lg" : ""}`} >
+        className={`pb-4 border-b rounded-none border-gray-300 w-full flex justify-start text-green-600 ${mobile ? "bg-white py-6 border-none rounded-lg" : ""}`} >
         <Image src={PDFIMAGE} alt="pdf export" width={30} height={30} />
         Export as PDF
       </Button>
@@ -158,7 +158,7 @@ const Header = ({
           handleExportPptx();
         }}
         variant="ghost"
-        className={`w-full flex justify-start text-[#5146E5] ${mobile ? "bg-white py-6" : ""}`}
+        className={`w-full flex justify-start text-green-600 ${mobile ? "bg-white py-6" : ""}`}
       >
         <Image src={PPTXIMAGE} alt="pptx export" width={30} height={30} />
         Export as PPTX
@@ -178,9 +178,9 @@ const Header = ({
           router.push(to);
         }}
         variant="ghost"
-        className="border border-white font-bold text-white rounded-[32px] transition-all duration-300 group"
+        className="border border-green-600 font-bold text-green-600 rounded-[32px] transition-all duration-300 group"
       >
-        <Play className="w-4 h-4 mr-1 stroke-white group-hover:stroke-black" />
+        <Play className="w-4 h-4 mr-1 stroke-green-600 group-hover:stroke-black" />
         Present
       </Button>
 
@@ -191,7 +191,7 @@ const Header = ({
       }} className="hidden lg:block relative ">
         <Popover open={open} onOpenChange={setOpen} >
           <PopoverTrigger asChild>
-            <Button className={`border py-5 text-[#5146E5] font-bold rounded-[32px] transition-all duration-500 hover:border hover:bg-[#5146E5] hover:text-white w-full ${mobile ? "" : "bg-white"}`}>
+            <Button className={`border py-5 text-green-600 font-bold rounded-[32px] transition-all duration-500 hover:border hover:bg-green-600 hover:text-white w-full ${mobile ? "" : "bg-white"}`}>
               <SquareArrowOutUpRight className="w-4 h-4 mr-1" />
               Export
             </Button>
@@ -219,33 +219,23 @@ const Header = ({
       />
       <div
 
-        className="bg-[#5146E5] w-full shadow-lg sticky top-0 ">
+        className="bg-green-600 w-full shadow-lg sticky top-0 ">
 
         <Announcement />
-        <Wrapper className="flex items-center justify-between py-1">
-          <Link href="/dashboard" className="min-w-[162px]">
-            <img
-              className="h-16"
-              src="/logo-white.png"
-              alt="Presentation logo"
-            />
-          </Link>
-
+        <Wrapper className="flex items-center py-1">
+          {/* Flex spacer to push MenuItems to the right */}
+          <div className="flex-1" />
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-4 2xl:gap-6">
             {isStreaming && (
-              <Loader2 className="animate-spin text-white font-bold w-6 h-6" />
+              <Loader2 className="animate-spin text-green-600 font-bold w-6 h-6" />
             )}
-
-
             <MenuItems mobile={false} />
-            <HeaderNav />
           </div>
 
           {/* Mobile Menu */}
           <div className="lg:hidden flex items-center gap-4">
-            <HeaderNav />
-
+            <MenuItems mobile={true} />
           </div>
         </Wrapper>
 

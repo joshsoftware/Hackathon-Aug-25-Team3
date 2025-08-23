@@ -19,7 +19,7 @@ export const SaveLayoutButton: React.FC<SaveLayoutButtonProps> = ({
       <Button
         onClick={onSave}
         disabled={isSaving || isProcessing}
-        className="bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-10 py-3 text-lg"
+        className="bg-green-600 hover:bg-green-700 text-green-600 shadow-lg hover:shadow-xl transition-all duration-200 px-10 py-3 text-lg"
         size="lg"
       >
         {isSaving ? (
@@ -36,4 +36,4 @@ export const SaveLayoutButton: React.FC<SaveLayoutButtonProps> = ({
       </Button>
     </div>
   );
-}; 
+};

@@ -84,7 +84,7 @@ const PresentationPage = ({ presentation_id }: { presentation_id: string }) => {
               Please check your internet connection or try again later.
             </p>
             <Button
-              className="mt-4 bg-red-500 text-white hover:bg-red-600 focus:ring-4 focus:ring-red-300"
+              className="mt-4 bg-red-500 text-green-600 hover:bg-red-600 focus:ring-4 focus:ring-red-300"
               onClick={() => {
                 trackEvent(MixpanelEvent.PdfMaker_Retry_Button_Clicked, { pathname });
                 window.location.reload();
