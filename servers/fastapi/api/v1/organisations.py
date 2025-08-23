@@ -95,8 +95,8 @@ async def onboard_organisation_with_admin(
     # Check if email already exists
     query = select(User).where(User.email == onboarding_data.admin_email)
     result = await session.execute(query)
-    existing_user = result.first()
-    if existing_user:
+    existing_user_tuple = result.first()
+    if existing_user_tuple:
         raise HTTPException(
             status_code=400,
             detail="Email already registered"
@@ -132,12 +132,15 @@ async def login(
     # Find user by email
     query = select(User).where(User.email == login_data.email)
     result = await session.execute(query)
-    user = result.first()
-    if not user:
+    user_tuple = result.first()
+    if not user_tuple:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
         )
+    
+    # Extract the User object from the tuple
+    user = user_tuple[0]
 
     # Verify password
     if not verify_password(login_data.password, user.password):

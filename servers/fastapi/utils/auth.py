@@ -61,6 +61,7 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
+    # Using session.get is fine here as it returns the actual model instance, not a tuple
     user = await session.get(User, user_id)
     if user is None:
         raise HTTPException(
