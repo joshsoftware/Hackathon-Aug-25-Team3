@@ -29,9 +29,10 @@ export default function SignupPage() {
 
     try {
       const response = await signup({
-        organizationName,
-        userName,
-        email,
+        organisation_name: organizationName,
+        admin_full_name: userName,
+        admin_email: email,
+        admin_password: "Test@123",
       });
       setAuthToken(response.token);
       toast.success("Account created successfully!");

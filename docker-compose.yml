@@ -98,7 +98,7 @@ services:
       - TOOL_CALLS=${TOOL_CALLS}
       - DISABLE_THINKING=${DISABLE_THINKING}
       - WEB_GROUNDING=${WEB_GROUNDING}
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=postgresql://neondb_owner:npg_yqpEu2J3omTx@ep-still-smoke-a1rc5o36-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       - DISABLE_ANONYMOUS_TRACKING=${DISABLE_ANONYMOUS_TRACKING}
 
   development-gpu:

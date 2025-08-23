@@ -17,7 +17,7 @@ export const PresentationCard = ({
   title,
   created_at,
   slide,
-  onDeleted
+  onDeleted,
 }: {
   id: string;
   title: string;
@@ -28,8 +28,6 @@ export const PresentationCard = ({
   const router = useRouter();
   const { renderSlideContent } = useGroupLayouts();
 
-
-
   const handlePreview = (e: React.MouseEvent) => {
     e.preventDefault();
     router.push(`/presentation?id=${id}`);
@@ -38,7 +36,6 @@ export const PresentationCard = ({
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
 
     const response = await DashboardApi.deletePresentation(id);
 
@@ -56,9 +53,7 @@ export const PresentationCard = ({
   return (
     <Card
       onClick={handlePreview}
-
       className="bg-white rounded-[8px] slide-theme cursor-pointer overflow-hidden p-4"
-
     >
       <div className="space-y-4">
         {/* Date */}
@@ -67,11 +62,11 @@ export const PresentationCard = ({
             {new Date(created_at).toLocaleDateString()}
           </p>
           <Popover>
-            <PopoverTrigger className="w-6 h-6 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-700" onClick={(e) => e.stopPropagation()}>
-
-
+            <PopoverTrigger
+              className="w-6 h-6 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-700"
+              onClick={(e) => e.stopPropagation()}
+            >
               <DotsVerticalIcon className="w-4 h-4 text-gray-500" />
-
             </PopoverTrigger>
             <PopoverContent align="end" className="bg-white w-[200px]">
               <button
@@ -85,10 +80,9 @@ export const PresentationCard = ({
           </Popover>
         </div>
 
-        <div className=" slide-box relative overflow-hidden border aspect-video"
-          style={{
-
-          }}
+        <div
+          className=" slide-box relative overflow-hidden border aspect-video"
+          style={{}}
         >
           <div className="absolute bg-transparent z-40 top-0 left-0 w-full h-full" />
           <div className="transform scale-[0.2] flex justify-center items-center origin-top-left  w-[500%] h-[500%]">

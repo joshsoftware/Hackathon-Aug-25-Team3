@@ -1,15 +1,13 @@
-
 const nextConfig = {
   reactStrictMode: false,
   distDir: ".next-build",
-  
 
   // Rewrites for development - proxy font requests to FastAPI backend
   async rewrites() {
     return [
       {
-        source: '/app_data/fonts/:path*',
-        destination: 'http://localhost:8000/app_data/fonts/:path*',
+        source: "/app_data/fonts/:path*",
+        destination: "http://localhost:5001/app_data/fonts/:path*",
       },
     ];
   },
@@ -54,7 +52,6 @@ const nextConfig = {
       },
     ],
   },
-  
 };
 
 export default nextConfig;
