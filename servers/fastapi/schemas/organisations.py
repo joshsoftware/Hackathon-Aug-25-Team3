@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
+from fastapi import UploadFile, File
 
 # Organisation Schemas
 class OrganisationCreate(BaseModel):
@@ -55,3 +56,13 @@ class OrganisationCreateResponse(BaseModel):
     success: bool
     message: str
     organisation_id: str
+
+# Organisation Update Schema
+class OrganisationUpdate(BaseModel):
+    name: Optional[str] = None
+    logo_url: Optional[str] = None
+
+class OrganisationUpdateResponse(BaseModel):
+    success: bool
+    message: str
+    organisation: OrganisationResponse

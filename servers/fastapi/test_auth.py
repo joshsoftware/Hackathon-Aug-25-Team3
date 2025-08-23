@@ -11,8 +11,8 @@ import requests
 import sys
 
 # When running inside Docker, we need to use the service name instead of localhost
-# BASE_URL = "http://localhost:3001/api/v1"  # For running on host
-BASE_URL = "http://localhost:80/api/v1"  # For running inside Docker container
+BASE_URL = "http://localhost:3001/api/v1"  # For running on host
+# BASE_URL = "http://localhost:80/api/v1"  # For running inside Docker container
 TEST_ORG_NAME = "Test Organization"
 TEST_ADMIN_NAME = "Test Admin"
 TEST_ADMIN_EMAIL = "admin@testorg.com"

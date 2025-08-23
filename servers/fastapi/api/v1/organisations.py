@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlmodel import Session, select
 from schemas.organisations import (
     OrganisationCreate,
@@ -9,7 +9,9 @@ from schemas.organisations import (
     LoginRequest,
     OrganisationOnboardingRequest,
     OrganisationCreateResponse,
-    SimpleOrganisationOnboardRequest
+    SimpleOrganisationOnboardRequest,
+    OrganisationUpdate,
+    OrganisationUpdateResponse
 )
 from models.sql.organisation import Organisation
 from models.sql.user import User
@@ -20,6 +22,7 @@ from utils.auth import (
     verify_password,
     get_current_user
 )
+from utils.file_upload import save_logo
 
 router = APIRouter()
 
@@ -170,3 +173,91 @@ async def get_current_user_info(
 ):
     """Get current user information"""
     return current_user
+
+@router.get("/{org_id}", response_model=OrganisationResponse)
+async def get_organisation(
+    org_id: str,
+    session: Session = Depends(get_async_session),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get organization details by ID.
+    
+    This endpoint:
+    1. Retrieves the organization details by ID
+    2. Returns the organization details
+    """
+    # Check if the user belongs to the organization
+    if current_user.organisation_id != org_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to access this organization"
+        )
+    
+    # Get the organization
+    org = await session.get(Organisation, org_id)
+    if not org:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Organization not found"
+        )
+    
+    return org
+
+@router.put("/update", response_model=OrganisationUpdateResponse)
+async def update_organisation(
+    name: str = Form(None),
+    logo: UploadFile = File(None),
+    session: Session = Depends(get_async_session),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Update the current user's organization details.
+    
+    This endpoint:
+    1. Updates the organization name and/or logo
+    2. Returns the updated organization details
+    """
+    # Check if the user is an admin
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to update this organization"
+        )
+    
+    # Get the organization
+    org_id = current_user.organisation_id
+    org = await session.get(Organisation, org_id)
+    if not org:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Organization not found"
+        )
+    
+    # Update the organization name if provided
+    if name:
+        org.name = name
+    
+    # Update the organization logo if provided
+    if logo:
+        logo_path = await save_logo(logo)
+        org.logo_url = logo_path
+    
+    # Save the changes
+    session.add(org)
+    await session.commit()
+    await session.refresh(org)
+    
+    # Convert Organisation to OrganisationResponse
+    org_response = OrganisationResponse(
+        id=org.id,
+        name=org.name,
+        logo_url=org.logo_url,
+        created_at=org.created_at
+    )
+    
+    return OrganisationUpdateResponse(
+        success=True,
+        message=f"Organisation '{org.name}' updated successfully",
+        organisation=org_response
+    )
