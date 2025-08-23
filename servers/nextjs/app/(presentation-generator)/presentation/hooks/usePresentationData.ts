@@ -1,8 +1,8 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { setPresentationData } from "@/store/slices/presentationGeneration";
-import { DashboardApi } from '../../services/api/dashboard';
+import { dashboardApi } from "../../services/api/dashboard";
 
 export const usePresentationData = (
   presentationId: string,
@@ -13,9 +13,20 @@ export const usePresentationData = (
 
   const fetchUserSlides = useCallback(async () => {
     try {
-      const data = await DashboardApi.getPresentation(presentationId);
+      const data = await dashboardApi.getPresentation(presentationId);
       if (data) {
-        dispatch(setPresentationData(data));
+        dispatch(
+          setPresentationData({
+            ...data,
+            language: "en",
+            layout: {
+              name: "default",
+              ordered: true,
+              slides: data.slides || [],
+            },
+            n_slides: data.slides?.length || 0,
+          })
+        );
         setLoading(false);
       }
     } catch (error) {

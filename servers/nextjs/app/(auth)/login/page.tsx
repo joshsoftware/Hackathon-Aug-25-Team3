@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { login, setAuthToken } from "@/lib/auth";
+import { login, isAuthenticated } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,19 +18,30 @@ import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    // If already authenticated, redirect to dashboard or the requested page
+    if (isAuthenticated()) {
+      const from = searchParams.get("from") || "/dashboard";
+      router.replace(from);
+    }
+  }, [router, searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const response = await login({ email, password });
-      setAuthToken(response.token);
+      await login({ email, password });
       toast.success("Login successful!");
-      router.push("/dashboard");
+
+      // Redirect to the page they came from or dashboard
+      const from = searchParams.get("from") || "/dashboard";
+      router.replace(from);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to login");
     } finally {
@@ -40,40 +51,35 @@ export default function LoginPage() {
 
   return (
     <div className="container flex items-center justify-center">
-      <Card className="w-full max-w-md bg-card/95 shadow-2xl border-primary/20">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+      <Card className="w-[400px]">
+        <CardHeader>
+          <CardTitle>Login</CardTitle>
           <CardDescription>
-            Enter your email and password to login to your account
+            Enter your email and password to access your account
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                Email
-              </label>
+              <label htmlFor="email">Email</label>
               <Input
                 id="email"
                 type="email"
-                placeholder="name@example.com"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
-                Password
-              </label>
+              <label htmlFor="password">Password</label>
               <Input
                 id="password"
                 type="password"
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                disabled={isLoading}
               />
             </div>
           </CardContent>
@@ -81,12 +87,9 @@ export default function LoginPage() {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Logging in..." : "Login"}
             </Button>
-            <p className="text-sm text-center text-muted-foreground">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/signup"
-                className="text-primary hover:underline font-medium"
-              >
+            <p className="text-sm text-center">
+              Don't have an account?{" "}
+              <Link href="/signup" className="text-primary hover:underline">
                 Sign up
               </Link>
             </p>
