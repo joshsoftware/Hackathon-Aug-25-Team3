@@ -270,9 +270,9 @@ const DocumentsPreviewPage: React.FC = () => {
             <ToolTip content="Open Panel">
               <Button
                 onClick={() => setIsOpen(true)}
-                className="bg-[#5146E5] text-white p-3 shadow-lg"
+                className="bg-[#5146E5] text-green-600 p-3 shadow-lg"
               >
-                <PanelRightOpen className="text-white" size={20} />
+                <PanelRightOpen className="text-green-600" size={20} />
               </Button>
             </ToolTip>
           </div>
@@ -289,7 +289,7 @@ const DocumentsPreviewPage: React.FC = () => {
             onClick={handleCreatePresentation}
             className="flex items-center gap-2 px-8 py-6 rounded-sm text-md bg-[#5146E5] hover:bg-[#5146E5]/90"
           >
-            <span className="text-white font-semibold">Next</span>
+            <span className="text-green-600 font-semibold">Next</span>
             <ChevronRight />
           </Button>
         </div>

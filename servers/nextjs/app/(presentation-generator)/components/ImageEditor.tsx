@@ -459,7 +459,7 @@ const ImageEditor = ({
                     }}
                     className="aspect-[4/3] group  rounded-lg overflow-hidden relative border border-gray-200"
                   >
-                    <p className="group-hover:opacity-100 opacity-0 transition-opacity absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm text-center font-medium bg-black/50 text-white px-2 py-1 rounded">
+                    <p className="group-hover:opacity-100 opacity-0 transition-opacity absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm text-center font-medium bg-black/50 text-green-600 px-2 py-1 rounded">
                       Click to Change Focus Point
                     </p>
                     {previewImages && (
@@ -479,12 +479,12 @@ const ImageEditor = ({
                     )}
                     {isFocusPointMode && (
                       <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                        <div className="text-white text-center p-2 bg-black/50 rounded">
+                        <div className="text-green-600 text-center p-2 bg-black/50 rounded">
                           <p className="text-sm font-medium pointer-events-none">
                             Click anywhere to set focus point
                           </p>
                           <button
-                            className="mt-2 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+                            className="mt-2 px-3 py-1 bg-blue-500 text-green-600 text-xs rounded hover:bg-blue-600"
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleFocusPointMode();
@@ -495,7 +495,7 @@ const ImageEditor = ({
                         </div>
 
                         <div
-                          className="absolute w-8 h-8 border-2 border-white rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                          className="absolute w-8 h-8 border-2 border-green-600 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                           style={{
                             left: `${focusPoint.x}%`,
                             top: `${focusPoint.y}%`,
@@ -503,10 +503,10 @@ const ImageEditor = ({
                           }}
                         >
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                            <div className="w-2 h-2 bg-green-600 rounded-full"></div>
                           </div>
-                          <div className="absolute w-16 h-0.5 bg-white/70 left-1/2 -translate-x-1/2"></div>
-                          <div className="absolute w-0.5 h-16 bg-white/70 top-1/2 -translate-y-1/2"></div>
+                          <div className="absolute w-16 h-0.5 bg-green-600/70 left-1/2 -translate-x-1/2"></div>
+                          <div className="absolute w-0.5 h-16 bg-green-600/70 top-1/2 -translate-y-1/2"></div>
                         </div>
                       </div>
                     )}

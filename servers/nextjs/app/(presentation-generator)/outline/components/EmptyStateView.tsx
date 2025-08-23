@@ -38,7 +38,7 @@ const EmptyStateView: React.FC = () => {
                     <div className="pt-4">
                         <Button
                             onClick={() => router.push("/upload")}
-                            className="group bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                            className="group bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-green-600 px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                         >
                             <Plus className="w-5 h-5 mr-2" />
                             Create New Presentation
@@ -52,4 +52,4 @@ const EmptyStateView: React.FC = () => {
     );
 };
 
-export default EmptyStateView; 
+export default EmptyStateView;

@@ -28,12 +28,10 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      const response = await signup({
-        organizationName,
-        userName,
-        email,
-      });
-      setAuthToken(response.token);
+      // Mock API call with setTimeout
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Optionally set a dummy token or user info here
+      // setAuthToken("dummy-token");
       toast.success("Account created successfully!");
       router.push("/dashboard");
     } catch (error) {

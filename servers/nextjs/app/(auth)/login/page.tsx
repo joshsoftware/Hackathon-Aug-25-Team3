@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { login, setAuthToken } from "@/lib/auth";
+import { setAuthToken } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,12 +27,16 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await login({ email, password });
-      setAuthToken(response.token);
-      toast.success("Login successful!");
+      // Mock API call with setTimeout
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Optionally set a dummy token or user info here
+      // setAuthToken("dummy-token");
+      toast.success("Logged in successfully!");
       router.push("/dashboard");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to login");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to login"
+      );
     } finally {
       setIsLoading(false);
     }
