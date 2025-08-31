@@ -31,6 +31,20 @@ class TempFileService:
         os.makedirs(os.path.dirname(full_path), exist_ok=True)
         return full_path
 
+    def save_file(self, temp_dir: str, file_object, filename: str) -> str:
+        """
+        Saves an uploaded file object to a temporary directory.
+        file_object is expected to be a file-like object from UploadFile.file
+        """
+        file_path = os.path.join(temp_dir, filename)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, "wb") as buffer:
+            # Read chunks from the uploaded file and write to the buffer
+            # Assuming file_object is an SpooledTemporaryFile or similar
+            for chunk in iter(lambda: file_object.read(1024 * 1024), b''): # Read in 1MB chunks
+                buffer.write(chunk)
+        return file_path
+
     def create_temp_file(
         self, file_path: str, content: Union[bytes, str], dir_path: Optional[str] = None
     ) -> str:

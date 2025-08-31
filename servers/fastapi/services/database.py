@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     AsyncSession,
 )
+from sqlalchemy import text
 from sqlmodel import SQLModel
 
 from models.sql.image_asset import ImageAsset
@@ -17,6 +18,7 @@ from models.sql.presentation_layout_code import PresentationLayoutCodeModel
 from models.sql.template import TemplateModel
 from models.sql.organisation import Organisation
 from models.sql.user import User
+from models.sql.document_chunk import DocumentChunk
 from utils.db_utils import get_database_url_and_connect_args
 
 
@@ -49,6 +51,8 @@ async def get_container_db_async_session() -> AsyncGenerator[AsyncSession, None]
 # Create Database and Tables
 async def create_db_and_tables():
     async with sql_engine.begin() as conn:
+        if sql_engine.url.drivername.startswith("postgresql"):
+            await conn.execute(text('CREATE EXTENSION IF NOT EXISTS vector'))
         await conn.run_sync(
             lambda sync_conn: SQLModel.metadata.create_all(
                 sync_conn,
@@ -61,6 +65,7 @@ async def create_db_and_tables():
                     TemplateModel.__table__,
                     Organisation.__table__,
                     User.__table__,
+                    DocumentChunk.__table__,
                 ],
             )
         )

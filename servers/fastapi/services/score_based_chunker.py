@@ -158,6 +158,5 @@ class ScoreBasedChunker:
         chunks = await asyncio.to_thread(
             self.get_chunks_from_headings, text, headings, heading_scores, n
         )
-        if len(chunks) < n:
-            raise ValueError(f"Only {len(chunks)} chunks found, requested {n}")
+        
         return chunks

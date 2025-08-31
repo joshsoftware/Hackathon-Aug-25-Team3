@@ -12,7 +12,7 @@ async def get_current_user_id(authorization: Optional[str] = Header(None)) -> st
     if not authorization:
         # For development, we'll return a default user_id if no token is provided
         # In production, this should raise an HTTPException for unauthorized access
-        return "default_user"
+        return "josh-software"
     
     try:
         # Remove 'Bearer ' prefix if present

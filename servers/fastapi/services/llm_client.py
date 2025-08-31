@@ -15,6 +15,11 @@ from google.genai.types import (
     FunctionCallingConfig as GoogleFunctionCallingConfig,
     FunctionCallingConfigMode as GoogleFunctionCallingConfigMode,
 )
+
+import onnxruntime
+import numpy as np
+import os
+from transformers import AutoTokenizer # NEW IMPORT
 from google.genai.types import Tool as GoogleTool
 from anthropic import AsyncAnthropic
 from anthropic.types import Message as AnthropicMessage
@@ -66,6 +71,8 @@ class LLMClient:
         self.llm_provider = get_llm_provider()
         self._client = self._get_client()
         self.tool_calls_handler = LLMToolCallsHandler(self)
+        self._embedding_session = None
+        self._embedding_tokenizer = None # NEW: Initialize tokenizer
 
     # ? Use tool calls
     def use_tool_calls_for_structured_output(self) -> bool:
@@ -1605,3 +1612,57 @@ class LLMClient:
             [each.text for each in response.content if each.type == "text"]
         )
         return result
+    
+    async def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
+        if self._embedding_session is None:
+            # Model path now points to the directory containing model.onnx and tokenizer files
+            model_dir = os.path.join(os.path.dirname(__file__), "..", "chroma", "models", "onnx")
+            model_path = os.path.join(model_dir, "model.onnx")
+
+            if not os.path.exists(model_path):
+                raise FileNotFoundError(f"ONNX embedding model not found at {model_path}")
+
+            # Load the ONNX session
+            self._embedding_session = onnxruntime.InferenceSession(model_path)
+
+            # Load the tokenizer from the same directory
+            self._embedding_tokenizer = AutoTokenizer.from_pretrained(model_dir)
+
+        # Tokenize the input texts
+        # The model expects input_ids and attention_mask
+        inputs = self._embedding_tokenizer(
+            texts,
+            padding=True,
+            truncation=True,
+            return_tensors="np",  # Return numpy arrays for ONNX Runtime
+            max_length=self._embedding_tokenizer.model_max_length  # Use model's max length
+        )
+
+        # Prepare inputs for ONNX Runtime
+        # Ensure input names match the ONNX model's expected input names
+        onnx_inputs = {
+            "input_ids": inputs["input_ids"],
+            "attention_mask": inputs["attention_mask"],
+            # Add token_type_ids if your model requires it and tokenizer provides it
+            "token_type_ids": inputs["token_type_ids"] if "token_type_ids" in inputs else None,
+        }
+
+        # Run inference
+        # The output name might vary, commonly 'last_hidden_state' or 'output_0'
+        # We need to inspect the model to get the exact output name if it's not 'last_hidden_state'
+        outputs = self._embedding_session.run(None, onnx_inputs)
+
+        # Assuming the first output is the last_hidden_state
+        last_hidden_state = outputs[0]
+
+        # Apply mean pooling to get sentence embeddings
+        # This is a common pooling strategy for Sentence Transformers
+        input_mask_expanded = np.expand_dims(inputs["attention_mask"], -1).astype(float)
+        sum_embeddings = np.sum(last_hidden_state * input_mask_expanded, 1)
+        sum_mask = np.clip(input_mask_expanded.sum(1), a_min=1e-9, a_max=None)
+        embeddings = sum_embeddings / sum_mask
+
+        # Convert to list of lists
+        return embeddings.tolist()
+        
+    

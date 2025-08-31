@@ -43,6 +43,8 @@ from utils.llm_calls.generate_slide_content import (
 )
 from utils.process_slides import process_slide_and_fetch_assets
 from utils.randomizers import get_random_uuid
+from models.sql.document_chunk import DocumentChunk
+from services.llm_client import LLMClient
 
 
 PRESENTATION_ROUTER = APIRouter(prefix="/presentation", tags=["Presentation"])
@@ -350,10 +352,27 @@ async def generate_presentation_api(
     user_id: str = Depends(get_current_user_id),
 ):
     presentation_id = get_random_uuid()
-
-    # 3. Generate Outlines
+    
+    # 1. Generate Outlines
     presentation_outlines = None
-    additional_context = ""
+
+    # 2. Get relevant context from documents using RAG
+    llm_client = LLMClient()
+    prompt_embedding = await llm_client.generate_embeddings([request.prompt])
+    
+    query = select(DocumentChunk).where(DocumentChunk.tenant_id == user_id)
+
+    # 3. If a specific document is requested, filter by it
+    if request.source_document_id:
+        query = query.where(DocumentChunk.document_id == request.source_document_id)
+
+    # 4. Perform vector similarity search and limit results
+    query = query.order_by(DocumentChunk.embedding.l2_distance(prompt_embedding[0])).limit(5)
+    
+    relevant_chunks = await sql_session.scalars(query)
+    additional_context = "\n\n".join([chunk.content for chunk in relevant_chunks])
+
+    # 5. Generate Outlines
 
     if not presentation_outlines:
         presentation_outlines_text = ""
@@ -361,7 +380,7 @@ async def generate_presentation_api(
             request.prompt,
             request.n_slides,
             request.language,
-            additional_context,
+            additional_context, # Pass the retrieved context here
         ):
             presentation_outlines_text += chunk
 

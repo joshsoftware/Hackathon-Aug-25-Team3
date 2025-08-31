@@ -31,10 +31,10 @@ RUN curl -fsSL http://ollama.com/install.sh | sh
 
 # Install dependencies for FastAPI
 RUN pip install aiohttp aiomysql aiosqlite asyncpg fastapi[standard] \
-  pathvalidate pdfplumber chromadb sqlmodel \
+  pathvalidate pdfplumber chromadb sqlmodel pgvector \
   anthropic google-genai openai fastmcp \
-  python-jose[cryptography] passlib
-RUN pip install docling --extra-index-url https://download.pytorch.org/whl/cpu
+  python-jose[cryptography] passlib numpy onnxruntime transformers
+RUN pip install docling --find-links https://download.pytorch.org/whl/cpu
 
 # Install dependencies for Next.js
 WORKDIR /node_dependencies
