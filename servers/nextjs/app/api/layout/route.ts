@@ -22,14 +22,27 @@ export async function GET(request: Request) {
     });
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720 });
-    page.setDefaultNavigationTimeout(300000);
-    page.setDefaultTimeout(300000);
-    await page.goto(schemaPageUrl, {
-      waitUntil: "networkidle0",
-      timeout: 300000,
-    });
+    page.setDefaultNavigationTimeout(600000);
+    page.setDefaultTimeout(600000);
     
-    await page.waitForSelector("[data-layouts]", { timeout: 300000 });
+    const response = await page.goto(schemaPageUrl, {
+      waitUntil: "networkidle0",
+      timeout: 600000,
+    });
+
+    // DEBUG: Log page content to see what is being loaded
+    const pageContent = await page.content();
+    console.log("--- DEBUG: Page Content Start ---");
+    console.log(pageContent);
+    console.log("--- DEBUG: Page Content End ---");
+
+    // If the response is not OK, something is wrong with the page itself
+    if (!response.ok()) {
+      console.error(`Failed to load page: Status ${response.status()} ${response.statusText()}`);
+      throw new Error(`Failed to load page: Status ${response.status()} ${response.statusText()}`);
+    }
+    
+    await page.waitForSelector("[data-layouts]", { timeout: 600000 });
 
     // Extract both data-layouts and data-group-settings attributes
     const { dataLayouts, dataGroupSettings } = await page.$eval(
@@ -55,7 +68,7 @@ export async function GET(request: Request) {
     }
 
     // Compose the response to match PresentationLayoutModel
-    const response = {
+    const layoutResponse = {
       name: groupName,
       ordered: groupSettings?.ordered ?? false,
       slides: slides.map((slide: any) => ({
@@ -66,7 +79,7 @@ export async function GET(request: Request) {
       })),
     };
 
-    return NextResponse.json(response);
+    return NextResponse.json(layoutResponse);
   } catch (err) {
     console.error("Error fetching or parsing client page:", err);
     return NextResponse.json(
