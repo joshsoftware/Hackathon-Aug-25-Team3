@@ -1,10 +1,9 @@
 /**
  * UploadPage Component
  * 
- * This component handles the presentation generation upload process, allowing users to:
+ * This component handles the presentation generation process, allowing users to:
  * - Configure presentation settings (slides, language)
- * - Input prompts
- * - Upload supporting documents
+ * - Input prompts for generating presentations
  * 
  * @component
  */
@@ -17,7 +16,6 @@ import { clearOutlines, setPresentationId } from "@/store/slices/presentationGen
 import { ConfigurationSelects } from "./ConfigurationSelects";
 import { PromptInput } from "./PromptInput";
 import { LanguageType, PresentationConfig } from "../type";
-import SupportingDoc from "./SupportingDoc";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { toast } from "sonner";
@@ -42,7 +40,6 @@ const UploadPage = () => {
   const dispatch = useDispatch();
 
   // State management
-  const [files, setFiles] = useState<File[]>([]);
   const [config, setConfig] = useState<PresentationConfig>({
     slides: "8",
     language: LanguageType.English,
@@ -67,7 +64,7 @@ const UploadPage = () => {
   };
 
   /**
-   * Validates the current configuration and files
+   * Validates the current configuration
    * @returns boolean indicating if the configuration is valid
    */
   const validateConfiguration = (): boolean => {
@@ -76,8 +73,8 @@ const UploadPage = () => {
       return false;
     }
 
-    if (!config.prompt.trim() && files.length === 0) {
-      toast.error("No Prompt or Document Provided");
+    if (!config.prompt.trim()) {
+      toast.error("Please provide a prompt for your presentation");
       return false;
     }
     return true;
@@ -90,58 +87,16 @@ const UploadPage = () => {
     if (!validateConfiguration()) return;
 
     try {
-      const hasUploadedAssets = files.length > 0;
-
-      if (hasUploadedAssets) {
-        await handleDocumentProcessing();
-      } else {
-        await handleDirectPresentationGeneration();
-      }
+      await handlePresentationGeneration();
     } catch (error) {
       handleGenerationError(error);
     }
   };
 
   /**
-   * Handles document processing
+   * Handles presentation generation
    */
-  const handleDocumentProcessing = async () => {
-    setLoadingState({
-      isLoading: true,
-      message: "Processing documents...",
-      showProgress: true,
-      duration: 90,
-      extra_info: files.length > 0 ? "It might take a few minutes for large documents." : "",
-    });
-
-    let documents = [];
-
-    if (files.length > 0) {
-      trackEvent(MixpanelEvent.Upload_Upload_Documents_API_Call);
-      const uploadResponse = await PresentationGenerationApi.uploadDoc(files);
-      documents = uploadResponse;
-    }
-
-    const promises: Promise<any>[] = [];
-
-    if (documents.length > 0) {
-      trackEvent(MixpanelEvent.Upload_Decompose_Documents_API_Call);
-      promises.push(PresentationGenerationApi.decomposeDocuments(documents));
-    }
-    const responses = await Promise.all(promises);
-    dispatch(setPptGenUploadState({
-      config,
-      files: responses,
-    }));
-    dispatch(clearOutlines())
-    trackEvent(MixpanelEvent.Navigation, { from: pathname, to: "/documents-preview" });
-    router.push("/documents-preview");
-  };
-
-  /**
-   * Handles direct presentation generation without documents
-   */
-  const handleDirectPresentationGeneration = async () => {
+  const handlePresentationGeneration = async () => {
     setLoadingState({
       isLoading: true,
       message: "Generating outlines...",
@@ -149,12 +104,11 @@ const UploadPage = () => {
       duration: 30,
     });
 
-    // Use the first available layout group for direct generation
+    // Generate presentation based on prompt
     trackEvent(MixpanelEvent.Upload_Create_Presentation_API_Call);
     const createResponse = await PresentationGenerationApi.createPresentation({
       prompt: config?.prompt ?? "",
       n_slides: config?.slides ? parseInt(config.slides) : null,
-      file_paths: [],
       language: config?.language ?? "",
     });
 
@@ -204,11 +158,6 @@ const UploadPage = () => {
           data-testid="prompt-input"
         />
       </div>
-      <SupportingDoc
-        files={[...files]}
-        onFilesChange={setFiles}
-        data-testid="file-upload-input"
-      />
       <Button
         onClick={handleGeneratePresentation}
         className="w-full rounded-[32px] flex items-center justify-center py-6 bg-[#5141e5] text-white font-instrument_sans font-semibold text-xl hover:bg-[#5141e5]/80 transition-colors duration-300"

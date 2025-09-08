@@ -3,12 +3,19 @@ import {
   LoginRequest,
   OrganizationRegisterRequest,
 } from "@/app/(presentation-generator)/services/api/organizations";
-import { cookies } from "next/headers";
 
 interface JwtPayload {
   sub: string; // user_id
   exp: number;
   [key: string]: any;
+}
+
+interface User {
+  id: string;
+  full_name: string;
+  email: string;
+  is_admin: boolean;
+  organisation_id: string;
 }
 
 function decodeToken(token: string): JwtPayload | null {
@@ -27,7 +34,19 @@ function decodeToken(token: string): JwtPayload | null {
 export async function login(credentials: LoginRequest) {
   try {
     const response = await organizationApi.login(credentials);
-    setAuthToken(response.access_token);
+    console.log("response",response);
+    setAuthToken(response.access_token,response?.user?.is_admin ? "admin" : "user");
+    
+    // Get user info to determine role
+    try {
+      const userInfo = await organizationApi.getMe();
+      if (userInfo && userInfo.is_admin) {
+        localStorage.setItem("user_role", userInfo.is_admin);
+      }
+    } catch (error) {
+      console.error("Error fetching user role:", error);
+    }
+    
     // Log user_id from token
     const decoded = decodeToken(response.access_token);
     if (decoded) {
@@ -43,7 +62,7 @@ export async function signup(credentials: OrganizationRegisterRequest) {
   try {
     const response = await organizationApi.register(credentials);
     if (response.access_token) {
-      setAuthToken(response.access_token);
+      setAuthToken(response.access_token,response.user);
       // Log user_id from token
       const decoded = decodeToken(response.access_token);
       if (decoded) {
@@ -56,8 +75,13 @@ export async function signup(credentials: OrganizationRegisterRequest) {
   }
 }
 
-export function setAuthToken(token: string): void {
+
+
+export function setAuthToken(token: string, is_admin: string): void {
   localStorage.setItem("auth_token", token);
+  if (is_admin) {
+    localStorage.setItem("user_role", is_admin ? "admin" : "user");
+  }
   document.cookie = `auth_token=${token}; path=/; max-age=2592000`; // 30 days
   // Log user_id when token is set
   const decoded = decodeToken(token);
@@ -88,12 +112,21 @@ export function removeAuthToken(): void {
     }
   }
   localStorage.removeItem("auth_token");
+  localStorage.removeItem("user_role");
   document.cookie =
     "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 }
 
 export function isAuthenticated(): boolean {
   return !!getAuthToken();
+}
+
+export function getUserRole(): string | null {
+  return localStorage.getItem("user_role");
+}
+
+export function isAdmin(): boolean {
+  return getUserRole() === "admin";
 }
 
 // Helper to handle 401 responses

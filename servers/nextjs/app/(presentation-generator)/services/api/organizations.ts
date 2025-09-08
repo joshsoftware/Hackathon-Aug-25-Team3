@@ -11,13 +11,15 @@ export interface LoginRequest {
 export interface LoginResponse {
   access_token: string;
   token_type: string;
+  user: UserInfo;
 }
 
 export interface OrganizationRegisterRequest {
-  email: string;
-  password: string;
+  admin_email: string;
+  admin_password: string;
   organisation_name: string;
-  full_name: string;
+  admin_full_name: string;
+  is_admin?: string;
 }
 
 export interface UserInfo {
@@ -25,6 +27,7 @@ export interface UserInfo {
   email: string;
   organisation_name?: string;
   full_name?: string;
+  is_admin?: string;
 }
 
 export const organizationApi = {

@@ -1,75 +1,28 @@
-import { getHeader, getHeaderForFormData } from "./header";
+import { getHeader } from "./header";
 import { IconSearch, ImageGenerate, ImageSearch, PreviousGeneratedImagesResponse } from "./params";
 import { ApiResponseHandler } from "./api-error-handler";
 
 export class PresentationGenerationApi {
-  static async uploadDoc(documents: File[]) {
-    const formData = new FormData();
-
-    documents.forEach((document) => {
-      formData.append("files", document);
-    });
-
-    try {
-      const response = await fetch(
-        `/api/v1/ppt/files/upload`,
-        {
-          method: "POST",
-          headers: getHeaderForFormData(),
-          body: formData,
-          cache: "no-cache",
-        }
-      );
-
-      return await ApiResponseHandler.handleResponse(response, "Failed to upload documents");
-    } catch (error) {
-      console.error("Upload error:", error);
-      throw error;
-    }
-  }
-
-  static async decomposeDocuments(documentKeys: string[]) {
-    try {
-      const response = await fetch(
-        `/api/v1/ppt/files/decompose`,
-        {
-          method: "POST",
-          headers: getHeader(),
-          body: JSON.stringify({
-            file_paths: documentKeys,
-          }),
-          cache: "no-cache",
-        }
-      );
-      
-      return await ApiResponseHandler.handleResponse(response, "Failed to decompose documents");
-    } catch (error) {
-      console.error("Error in Decompose Files", error);
-      throw error;
-    }
-  }
  
     static async createPresentation({
     prompt,
     n_slides,
-    file_paths,
     language,
   }: {
     prompt: string;
     n_slides: number | null;
-    file_paths?: string[];
     language: string | null;
   }) {
     try {
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
       const response = await fetch(
-        `/api/v1/ppt/presentation/create`,
+        `${baseUrl}/api/v1/ppt/presentation/create`,
         {
           method: "POST",
           headers: getHeader(),
           body: JSON.stringify({
             prompt,
             n_slides,
-            file_paths,
             language,
           }),
           cache: "no-cache",
@@ -88,8 +41,9 @@ export class PresentationGenerationApi {
     prompt: string
   ) {
     try {
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
       const response = await fetch(
-        `/api/v1/ppt/slide/edit`,
+        `${baseUrl}/api/v1/ppt/slide/edit`,
         {
           method: "POST",
           headers: getHeader(),
@@ -110,8 +64,10 @@ export class PresentationGenerationApi {
 
   static async updatePresentationContent(body: any) {
     try {
+      // Use the correct API endpoint URL with the base URL
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
       const response = await fetch(
-        `/api/v1/ppt/presentation/update`,
+        `${baseUrl}/api/v1/ppt/presentation/update`,
         {
           method: "PUT",
           headers: getHeader(),
@@ -129,8 +85,9 @@ export class PresentationGenerationApi {
 
   static async presentationPrepare(presentationData: any) {
     try {
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
       const response = await fetch(
-        `/api/v1/ppt/presentation/prepare`,
+        `${baseUrl}/api/v1/ppt/presentation/prepare`,
         {
           method: "POST",
           headers: getHeader(),
@@ -151,8 +108,9 @@ export class PresentationGenerationApi {
   
   static async generateImage(imageGenerate: ImageGenerate) {
     try {
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
       const response = await fetch(
-        `/api/v1/ppt/images/generate?prompt=${imageGenerate.prompt}`,
+        `${baseUrl}/api/v1/ppt/images/generate?prompt=${imageGenerate.prompt}`,
         {
           method: "GET",
           headers: getHeader(),
@@ -169,8 +127,9 @@ export class PresentationGenerationApi {
 
   static getPreviousGeneratedImages = async (): Promise<PreviousGeneratedImagesResponse[]> => {
     try {
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
       const response = await fetch(
-        `/api/v1/ppt/images/generated`,
+        `${baseUrl}/api/v1/ppt/images/generated`,
         {
           method: "GET",
           headers: getHeader(),
@@ -186,8 +145,9 @@ export class PresentationGenerationApi {
   
   static async searchIcons(iconSearch: IconSearch) {
     try {
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
       const response = await fetch(
-        `/api/v1/ppt/icons/search?query=${iconSearch.query}&limit=${iconSearch.limit}`,
+        `${baseUrl}/api/v1/ppt/icons/search?query=${iconSearch.query}&limit=${iconSearch.limit}`,
         {
           method: "GET",
           headers: getHeader(),
@@ -207,8 +167,9 @@ export class PresentationGenerationApi {
   // EXPORT PRESENTATION
   static async exportAsPPTX(presentationData: any) {
     try {
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
       const response = await fetch(
-        `/api/v1/ppt/presentation/export/pptx`,
+        `${baseUrl}/api/v1/ppt/presentation/export/pptx`,
         {
           method: "POST",
           headers: getHeader(),

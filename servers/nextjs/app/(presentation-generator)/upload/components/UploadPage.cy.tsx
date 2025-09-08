@@ -112,169 +112,36 @@ describe('<UploadPage />', () => {
     })
   })
 
-  describe('File Upload', () => {
-    it('should handle document uploads', () => {
-      cy.fixture('example.txt').as('testFile')
-      cy.get('[data-testid="file-upload-input"]').selectFile('@testFile', { force: true })
-      cy.contains('example.txt').should('exist')
-      // Check for success toast
-      checkToast('Files selected')
-    })
-  })
-  describe('File Handling', () => {
-    beforeEach(() => {
-      // Create a text file fixture
-      cy.writeFile('cypress/fixtures/test-doc.txt', 'Test content')
-    })
-
-    it('should handle multiple document uploads', () => {
-      // Create two files with different names
-      const file1 = new File(['content1'], 'document1.txt', { type: 'text/plain' })
-      const file2 = new File(['content2'], 'document2.txt', { type: 'text/plain' })
-
-      // Upload multiple files
-      cy.get('[data-testid="file-upload-input"]')
-        .selectFile([
-          { contents: file1, fileName: 'document1.txt' },
-          { contents: file2, fileName: 'document2.txt' }
-        ], { force: true })
-
-      // Verify files are listed
-      cy.get('[data-testid="file-list"]').within(() => {
-        cy.contains('document1.txt').should('be.visible')
-        cy.contains('document2.txt').should('be.visible')
-      })
-      checkToast('Files selected')
-    })
-
-    it('should handle image uploads', () => {
-      // Create an image file
-      const imageFile = new File(['image content'], 'test-image.jpg', { type: 'image/jpeg' })
-
-      cy.get('[data-testid="file-upload-input"]')
-        .selectFile({
-          contents: imageFile,
-          fileName: 'test-image.jpg',
-          mimeType: 'image/jpeg'
-        }, { force: true })
-
-      // Verify image is listed
-      cy.get('[data-testid="file-list"]').within(() => {
-        cy.contains('test-image.jpg').should('be.visible')
-      })
-      checkToast('Files selected')
-    })
-
-    it('should handle mixed document and image uploads', () => {
-      // Create document and image files
-      const docFile = new File(['doc content'], 'test-doc.txt', { type: 'text/plain' })
-      const imageFile = new File(['image content'], 'test-image.jpg', { type: 'image/jpeg' })
-
-      cy.get('[data-testid="file-upload-input"]')
-        .selectFile([
-          { contents: docFile, fileName: 'test-doc.txt' },
-          { contents: imageFile, fileName: 'test-image.jpg', mimeType: 'image/jpeg' }
-        ], { force: true })
-
-      // Verify both files are listed
-      cy.get('[data-testid="file-list"]').within(() => {
-        cy.contains('test-doc.txt').should('be.visible')
-        cy.contains('test-image.jpg').should('be.visible')
-      })
-      checkToast('Files selected')
-    })
-  })
+  // File upload functionality has been removed
 
   describe('Validation', () => {
-    it('should show error when no prompt or documents provided', () => {
-      // Click next without entering prompt or uploading files
+    it('should show error when no prompt is provided', () => {
+      // Click next without entering prompt
       cy.contains('button', 'Next').click()
       // Check for error toast
-      checkToast('No Prompt or Document Provided')
-    })
-    it('should show error when no prompt provided but research mode is on', () => {
-      cy.get('[data-testid="research-mode-switch"]').click({ force: true })
-      cy.get('[data-testid="research-mode-switch"]').should('have.attr', 'aria-checked', 'true')
-      cy.contains('button', 'Next').click()
-      checkToast('No Prompt or Document Provided')
+      checkToast('Please provide a prompt for your presentation')
     })
   })
 
   describe('Generation Flow', () => {
-    it('should proceed to theme page with prompt-only configuration', () => {
+    it('should proceed to outline page with prompt configuration', () => {
       // Enter prompt
       cy.get('[data-testid="prompt-input"]').type('Create a presentation about AI')
 
-      // Click generate
-      cy.contains('button', 'Next').click()
-
-      // Wait for API calls with longer timeout
-      cy.wait('@getQuestions', { timeout: 10000 })
-      cy.wait('@generateTitles', { timeout: 10000 })
-
-      // Verify navigation to theme page
-      cy.get('@router.push').should('be.calledWith', '/theme')
-    })
-
-    it('should proceed to documents-preview with research mode', () => {
-      // Enable research mode
-      cy.get('[data-testid="research-mode-switch"]').click({ force: true })
-
-      // Enter prompt
-      cy.get('[data-testid="prompt-input"]').type('Research about AI technology')
-
-      // Intercept research report generation
-      cy.intercept('POST', '**/ppt/report/generate', {
+      // Intercept presentation creation API call
+      cy.intercept('POST', '**/ppt/presentation/create', {
         statusCode: 200,
-        body: { content: 'Research report content' }
-      }).as('researchReport')
+        body: { id: 'test-presentation-id' }
+      }).as('createPresentation')
 
       // Click generate
       cy.contains('button', 'Next').click()
 
-      // Wait for research API call
-      cy.wait('@researchReport', { timeout: 10000 })
+      // Wait for API call with longer timeout
+      cy.wait('@createPresentation', { timeout: 10000 })
 
-      // Verify navigation to documents-preview page
-      cy.get('@router.push').should('be.calledWith', '/documents-preview')
-    })
-
-    it('should proceed to documents-preview with uploaded document', () => {
-      // Upload a document
-      cy.fixture('example.txt').as('testFile')
-      cy.get('[data-testid="file-upload-input"]').selectFile('@testFile', { force: true })
-
-      // Enter prompt
-      cy.get('[data-testid="prompt-input"]').type('Analyze this document')
-
-      // Intercept document upload and decomposition
-      cy.intercept('POST', '**/ppt/files/upload', {
-        statusCode: 200,
-        body: {
-          documents: ['doc1'],
-          images: []
-        }
-      }).as('uploadDoc')
-
-      cy.intercept('POST', '**/ppt/files/decompose', {
-        statusCode: 200,
-        body: {
-          documents: { doc1: 'content' },
-          images: {},
-          charts: {},
-          tables: {}
-        }
-      }).as('decomposeDoc')
-
-      // Click generate
-      cy.contains('button', 'Next').click()
-
-      // Wait for upload and decompose API calls
-      cy.wait('@uploadDoc', { timeout: 10000 })
-      cy.wait('@decomposeDoc', { timeout: 10000 })
-
-      // Verify navigation to documents-preview page
-      cy.get('@router.push').should('be.calledWith', '/documents-preview')
+      // Verify navigation to outline page
+      cy.get('@router.push').should('be.calledWith', '/outline')
     })
   })
 

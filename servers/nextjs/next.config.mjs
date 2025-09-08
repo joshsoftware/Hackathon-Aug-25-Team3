@@ -2,12 +2,32 @@ const nextConfig = {
   reactStrictMode: false,
   distDir: ".next-build",
 
+  // Explicitly set the host for Server Actions
+  serverRuntimeConfig: {
+    host: 'localhost',
+    port: 3000,
+  },
+
   // Rewrites for development - proxy font requests to FastAPI backend
   async rewrites() {
     return [
       {
         source: "/app_data/fonts/:path*",
         destination: "http://localhost:5001/app_data/fonts/:path*",
+      },
+    ];
+  },
+
+  // Configure headers for Server Actions
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: 'http://localhost:3000' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,HEAD,PUT,PATCH,POST,DELETE' },
+          { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version' },
+        ],
       },
     ];
   },

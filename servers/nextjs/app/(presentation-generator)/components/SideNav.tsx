@@ -12,7 +12,9 @@ import {
   Settings,
   Layout,
   FilePlus2,
+  Upload,
 } from "lucide-react";
+import { isAdmin, getUserRole } from "@/lib/auth";
 import { useState } from "react";
 import { trackEvent, MixpanelEvent } from "@/utils/mixpanel";
 import { useSelector } from "react-redux";
@@ -24,6 +26,8 @@ export function SideNav() {
   const canChangeKeys = useSelector(
     (state: RootState) => state.userConfig.can_change_keys
   );
+  const userRole = getUserRole();
+  const adminUser = isAdmin();
 
   const navItems = [
     {
@@ -41,6 +45,15 @@ export function SideNav() {
       href: "/custom-template",
       icon: FilePlus2,
     },
+    ...(adminUser
+      ? [
+          {
+            title: "Upload Documents",
+            href: "/upload-documents",
+            icon: Upload,
+          },
+        ]
+      : []),
     ...(canChangeKeys
       ? [
           {
