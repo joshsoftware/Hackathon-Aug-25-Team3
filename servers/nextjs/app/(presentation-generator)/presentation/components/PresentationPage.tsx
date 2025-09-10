@@ -1,3 +1,4 @@
+
 "use client";
 import React, {  useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -40,9 +41,10 @@ const PresentationPage: React.FC<PresentationPageProps> = ({
 
   // Auto-save functionality
   const { isSaving } = useAutoSave({
-    debounceMs: 2000,
+    debounceMs: 5000,
     enabled: !!presentationData && !isStreaming,
   });
+
 
   // Custom hooks
   const { fetchUserSlides } = usePresentationData(

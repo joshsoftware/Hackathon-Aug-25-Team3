@@ -64,6 +64,9 @@ export const usePresentationGeneration = (
     }
     if (!validateInputs()) return;
 
+    console.log("Debugging handleSubmit:");
+    console.log("Outlines:", outlines);
+    console.log("Selected Layout Group:", selectedLayoutGroup);
 
 
     setLoadingState({

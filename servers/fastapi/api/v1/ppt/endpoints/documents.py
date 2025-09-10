@@ -1,6 +1,5 @@
 from typing import Annotated, List
-from fastapi import APIRouter, Depends, UploadFile, HTTPException
-from sqlalchemy import delete
+from fastapi import APIRouter, Depends, UploadFile, HTTPException, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from dependencies.auth import get_current_user_id
 from services.database import get_async_session
@@ -9,6 +8,7 @@ from services.score_based_chunker import ScoreBasedChunker
 from services.llm_client import LLMClient
 from services import TEMP_FILE_SERVICE
 from models.sql.document_chunk import DocumentChunk
+from utils.randomizers import get_random_uuid
 from sqlmodel import select
 
 DOCUMENTS_ROUTER = APIRouter(prefix="/documents", tags=["Documents"])
@@ -20,7 +20,7 @@ async def list_documents(
     user_id: Annotated[str, Depends(get_current_user_id)],
 ):
     result = await sql_session.execute(
-        select(DocumentChunk.document_id)
+        select(DocumentChunk.doc_id)
         .where(DocumentChunk.tenant_id == user_id)
         .distinct()
     )
@@ -31,52 +31,44 @@ async def list_documents(
 @DOCUMENTS_ROUTER.post("/upload")
 async def upload_document(
     files: List[UploadFile],
+    tags: Annotated[str, Form()],
     sql_session: Annotated[AsyncSession, Depends(get_async_session)],
     user_id: Annotated[str, Depends(get_current_user_id)],
 ):
     temp_dir = TEMP_FILE_SERVICE.create_temp_dir()
     docling_service = DoclingService()
     chunker = ScoreBasedChunker()
-
-    # --- TODO: Instantiate the embedding model client here --- #
+    tag_list = [tag.strip() for tag in tags.split(',')]
 
     for file in files:
-        # Use filename as the document_id. This is crucial for the 'delete-and-replace' strategy.
-        document_id = file.filename
-        if not document_id:
-            raise HTTPException(400, "Uploaded files must have a filename.")
-
-        # 1. Delete existing chunks for this document to handle updates.
-        await sql_session.execute(
-            delete(DocumentChunk).where(
-                DocumentChunk.tenant_id == user_id, DocumentChunk.document_id == document_id
-            )
-        )
-
-        # 2. Process and chunk the new document.
-        file_path = TEMP_FILE_SERVICE.save_file(temp_dir, file.file, document_id)
+        doc_uuid = get_random_uuid()
+        file_path = TEMP_FILE_SERVICE.save_file(temp_dir, file.file, file.filename or get_random_uuid())
         markdown_content = docling_service.parse_to_markdown(file_path)
-        chunks = await chunker.get_n_chunks(markdown_content, 100) # Increased chunk limit
+        
+        # Use the new chunker logic
+        temporary_chunks = await chunker.get_n_chunks(markdown_content, 10) # Using top_k=10 headings
+        chunk_contents = [chunk.content for chunk in temporary_chunks]
 
-        # 3. Generate embeddings for each chunk.
+        if not chunk_contents:
+            continue
+
         llm_client = LLMClient()
-        chunk_contents = [chunk.content for chunk in chunks]
         embeddings = await llm_client.generate_embeddings(chunk_contents)
 
-        # 4. Create DocumentChunk objects and save to the database.
         db_chunks = [
             DocumentChunk(
-                content=chunk.content,
+                content=chunk_content,
                 tenant_id=user_id,
-                document_id=document_id,
+                doc_id=doc_uuid,
+                tags=tag_list,
                 embedding=embedding,
             )
-            for chunk, embedding in zip(chunks, embeddings)
+            for chunk_content, embedding in zip(chunk_contents, embeddings)
         ]
         sql_session.add_all(db_chunks)
         await sql_session.commit()
 
-        print(f"Processed and saved {len(db_chunks)} chunks for file {document_id} for user {user_id}")
+        print(f"Processed and saved {len(db_chunks)} chunks for document {doc_uuid} with tags {tag_list} for user {user_id}")
 
     return {"message": f"{len(files)} documents processed and queued for embedding."}
 

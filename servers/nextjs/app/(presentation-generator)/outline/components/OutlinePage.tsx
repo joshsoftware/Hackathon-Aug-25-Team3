@@ -21,6 +21,8 @@ const OutlinePage: React.FC = () => {
     (state: RootState) => state.presentationGeneration
   );
 
+  console.log("------------------- OutlinePage Render ------------------", presentation_id, outlines);
+
   const [activeTab, setActiveTab] = useState<string>(TABS.OUTLINE);
   const [selectedLayoutGroup, setSelectedLayoutGroup] = useState<LayoutGroup | null>(null);
   // Custom hooks
@@ -32,6 +34,14 @@ const OutlinePage: React.FC = () => {
     selectedLayoutGroup,
     setActiveTab
   );
+  console.log("------=-========-=========-===============-===========-======", presentation_id)
+  console.log("[OutlinePage] presentation_id:", presentation_id);
+  console.log("[OutlinePage] outlines:", outlines);
+  console.log("[OutlinePage] activeTab:", activeTab);
+  console.log("[OutlinePage] selectedLayoutGroup:", selectedLayoutGroup);
+  console.log("[OutlinePage] streamState:", streamState);
+  console.log("[OutlinePage] loadingState:", loadingState);
+
   if (!presentation_id) {
     return <EmptyStateView />;
   }

@@ -32,9 +32,9 @@ export async function GET(request: Request) {
 
     // DEBUG: Log page content to see what is being loaded
     const pageContent = await page.content();
-    console.log("--- DEBUG: Page Content Start ---");
-    console.log(pageContent);
-    console.log("--- DEBUG: Page Content End ---");
+    // console.log("--- DEBUG: Page Content Start ---");
+    // console.log(pageContent);
+    // console.log("--- DEBUG: Page Content End ---");
 
     // If the response is not OK, something is wrong with the page itself
     if (!response.ok()) {

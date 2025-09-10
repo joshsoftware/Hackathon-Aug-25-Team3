@@ -13,6 +13,7 @@ export const useAutoSave = ({
     debounceMs = 2000,
     enabled = true,
 }: UseAutoSaveOptions = {}) => {
+    console.log('useAutoSave hook initialized with options:', { debounceMs, enabled });
     const { presentationData, isStreaming, isLoading, isLayoutLoading } = useSelector(
         (state: RootState) => state.presentationGeneration
     );
@@ -42,7 +43,7 @@ export const useAutoSave = ({
             try {
                 setIsSaving(true);
                 console.log('🔄 Auto-saving presentation data...');
-
+                console.log('Data to be saved:', data);                                                                                                                                                                                                                                                                                                                                                     
                 // Call the API to update presentation content
                 await PresentationGenerationApi.updatePresentationContent(data);
 
@@ -58,7 +59,7 @@ export const useAutoSave = ({
                 setIsSaving(false);
             }
         }, debounceMs);
-    }, [debounceMs, isSaving]);
+    }, [debounceMs]);
 
     // Effect to trigger auto-save when presentation data changes
     useEffect(() => {
@@ -78,4 +79,4 @@ export const useAutoSave = ({
     return {
         isSaving,
     };
-}; 
+};

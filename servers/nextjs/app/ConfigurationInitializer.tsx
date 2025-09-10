@@ -21,6 +21,10 @@ export function ConfigurationInitializer({
 
   // Fetch user config state
   useEffect(() => {
+    if (route === '/pdf-maker') {
+      setIsLoading(false);
+      return;
+    }
     fetchUserConfigState();
   }, []);
 
