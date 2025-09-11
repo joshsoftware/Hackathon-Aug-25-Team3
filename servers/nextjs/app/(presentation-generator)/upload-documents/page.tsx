@@ -15,6 +15,7 @@ import { DocumentPreview } from "./components/DocumentPreview";
 import { documentsApi, DocumentUploadResponse } from "../services/api/documents";
 
 export default function UploadDocumentsPage() {
+
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("sales");
@@ -44,22 +45,23 @@ export default function UploadDocumentsPage() {
       // Load uploaded documents
       loadUploadedDocuments();
     }
-  }, [router]);
+  }, [activeTab]);
 
   const loadUploadedDocuments = async () => {
     try {
       const documents = await documentsApi.getUploadedDocuments();
       setUploadedDocuments(
         documents.map((doc: DocumentUploadResponse) => ({
-          id: doc.document_id,
-          name: doc.file_name,
+          id: doc.id,
+          name: doc.filename,
           category: selectedCategory, // Note: Backend should return category
-          uploadDate: new Date(doc.uploaded_at),
+          uploadDate: new Date(doc.upload_date),
         }))
       );
+      console.log("Uploaded documents:", uploadedDocuments);
+      console.log("documents:", documents);
     } catch (error) {
-      // Error handling is done in the API service
-      // The service will use mock data if network fails
+      toast.error("Failed to load documents");
     }
   };
 
@@ -87,10 +89,10 @@ export default function UploadDocumentsPage() {
 
       // Add the uploaded document to the list
       const newDocument = {
-        id: uploadedDoc.document_id,
-        name: uploadedDoc.file_name,
+        id: uploadedDoc.id,
+        name: uploadedDoc.filename,
         category: selectedCategory,
-        uploadDate: new Date(uploadedDoc.uploaded_at),
+        uploadDate: new Date(uploadedDoc.upload_date),
       };
 
       setUploadedDocuments((prev) => [newDocument, ...prev]);
@@ -104,10 +106,10 @@ export default function UploadDocumentsPage() {
         fileInput.value = "";
       }
 
+      toast.success("Document uploaded successfully");
       setActiveTab("documents");
     } catch (error) {
-      // Error handling is done in the API service
-      // The service will use mock data if network fails
+      toast.error("Failed to upload document");
     } finally {
       setIsLoading(false);
     }
@@ -118,13 +120,14 @@ export default function UploadDocumentsPage() {
       await documentsApi.deleteDocument(id);
       
       setUploadedDocuments((prev) => prev.filter((doc) => doc.id !== id));
+      toast.success("Document deleted successfully");
     } catch (error) {
-      // Error handling is done in the API service
-      // The service will handle deletion errors
+      toast.error("Failed to delete document");
     }
   };
 
   const handlePreviewDocument = async (id: string) => {
+    console.log("Previewing document with ID:", id);
     try {
       const previewResult = await documentsApi.previewDocument(id);
       
@@ -138,8 +141,7 @@ export default function UploadDocumentsPage() {
         setIsPreviewOpen(true);
       }
     } catch (error) {
-      // Error handling is done in the API service
-      // The service will handle preview errors
+      toast.error("Failed to preview document");
     }
   };
 

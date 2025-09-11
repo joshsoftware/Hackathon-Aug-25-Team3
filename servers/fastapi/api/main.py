@@ -4,14 +4,14 @@ from api.lifespan import app_lifespan
 from api.middlewares import UserConfigEnvUpdateMiddleware, ServerActionsValidationMiddleware
 from api.v1.ppt.router import API_V1_PPT_ROUTER
 from api.v1.router import API_V1_ROUTER
-
+from api.document_router import router as document_router  # Add this import
 
 app = FastAPI(lifespan=app_lifespan)
-
 
 # Routers
 app.include_router(API_V1_PPT_ROUTER)
 app.include_router(API_V1_ROUTER)
+app.include_router(document_router)  # Add the document router
 
 # Middlewares
 origins = [
@@ -30,7 +30,8 @@ app.add_middleware(
         "Access-Control-Allow-Origin",
         "X-Requested-With",
         "X-Forwarded-Host",
-        "Origin"
+        "Origin",
+        "*"
     ],
 )
 
