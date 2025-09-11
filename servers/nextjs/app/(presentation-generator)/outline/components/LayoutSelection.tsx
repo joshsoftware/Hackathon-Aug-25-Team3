@@ -49,12 +49,6 @@ const LayoutSelection: React.FC<LayoutSelectionProps> = ({
         if (groups.length === 0) return [];
 
         const Groups: LayoutGroup[] = groups
-            .filter(groupName => {
-                // Filter out groups that contain any errored layouts (from custom templates compile/parse errors)
-                const fullData = getFullDataByGroup(groupName);
-                const hasErroredLayouts = fullData.some(fd => (fd as any)?.component?.displayName === "CustomTemplateErrorSlide");
-                return !hasErroredLayouts;
-            })
             .map(groupName => {
             const settings = getGroupSetting(groupName);
             const customMeta = summaryMap[groupName];
@@ -89,15 +83,44 @@ const LayoutSelection: React.FC<LayoutSelectionProps> = ({
     // Auto-select first group when groups are loaded
     useEffect(() => {
         if (layoutGroups.length > 0 && !selectedLayoutGroup) {
-            const defaultGroup = layoutGroups.find(g => g.default) || layoutGroups[0];
-            const slides = getLayoutsByGroup(defaultGroup.id);
-
-            onSelectLayoutGroup({
-                ...defaultGroup,
-                slides: slides,
-            });
+            // Try to find a default group with valid slides
+            let validGroupFound = false;
+            
+            // First try the default group
+            const defaultGroup = layoutGroups.find(g => g.default);
+            if (defaultGroup) {
+                const slides = getLayoutsByGroup(defaultGroup.id);
+                if (slides && slides.length > 0) {
+                    onSelectLayoutGroup({
+                        ...defaultGroup,
+                        slides: slides,
+                    });
+                    validGroupFound = true;
+                }
+            }
+            
+            // If no valid default group, try each group until we find one with valid slides
+            if (!validGroupFound) {
+                for (const group of layoutGroups) {
+                    const slides = getLayoutsByGroup(group.id);
+                    if (slides && slides.length > 0) {
+                        onSelectLayoutGroup({
+                            ...group,
+                            slides: slides,
+                        });
+                        validGroupFound = true;
+                        break;
+                    }
+                }
+            }
+            
+            // If still no valid group found, show an error
+            if (!validGroupFound && layoutGroups.length > 0) {
+                console.error("No valid templates found in any group");
+                alert("No valid templates found. Please try refreshing the page or contact support.");
+            }
         }
-    }, [layoutGroups, selectedLayoutGroup, onSelectLayoutGroup]);
+    }, [layoutGroups, selectedLayoutGroup, onSelectLayoutGroup, getLayoutsByGroup]);
     useEffect(() => {
     if (loading) {
       return;
@@ -152,10 +175,18 @@ const LayoutSelection: React.FC<LayoutSelectionProps> = ({
 
     const handleLayoutGroupSelection = (group: LayoutGroup) => {
         const slides = getLayoutsByGroup(group.id);
-        onSelectLayoutGroup({
-            ...group,
-            slides: slides,
-        });
+        
+        // Make sure we have at least one valid slide
+        if (slides && slides.length > 0) {
+            onSelectLayoutGroup({
+                ...group,
+                slides: slides,
+            });
+        } else {
+            // If no slides are found, show an error message
+            console.error(`No valid slides found for group: ${group.id}`);
+            alert("No valid templates found in this group. Please select another template group.");
+        }
     }
 
     return (
@@ -201,4 +232,4 @@ const LayoutSelection: React.FC<LayoutSelectionProps> = ({
     );
 };
 
-export default LayoutSelection; 
+export default LayoutSelection;

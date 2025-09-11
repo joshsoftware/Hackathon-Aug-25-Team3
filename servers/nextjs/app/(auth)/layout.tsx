@@ -8,13 +8,13 @@ export default function AuthLayout({
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center">
       {/* Background Image */}
-      <Image
+      {/* <Image
         src="/auth-bg.jpg"
         alt="Presentation workspace"
         fill
         className="object-cover object-center"
         priority
-      />
+      /> */}
 
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/40 to-background/90" />

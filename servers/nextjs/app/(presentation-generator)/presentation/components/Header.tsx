@@ -22,7 +22,6 @@ import Link from "next/link";
 import { RootState } from "@/store/store";
 import { toast } from "sonner";
 
-
 import Announcement from "@/components/Announcement";
 import { PptxPresentationModel } from "@/types/pptx_models";
 import HeaderNav from "../../components/HeaderNab";
@@ -30,12 +29,13 @@ import PDFIMAGE from "@/public/pdf.svg";
 import PPTXIMAGE from "@/public/pptx.svg";
 import Image from "next/image";
 import { trackEvent, MixpanelEvent } from "@/utils/mixpanel";
+import { UserProfile } from "../../components/UserProfile";
 
 const Header = ({
   presentation_id,
   currentSlide,
 }: {
-  presentation_id: string;
+  presentation_id?: string;
   currentSlide?: number;
 }) => {
   const [open, setOpen] = useState(false);
@@ -217,10 +217,7 @@ const Header = ({
         showProgress={true}
         duration={40}
       />
-      <div
-
-        className="bg-[#5146E5] w-full shadow-lg sticky top-0 ">
-
+      <div className="bg-[#5146E5] w-full shadow-lg sticky top-0 ">
         <Announcement />
         <Wrapper className="flex items-center justify-between py-1">
           <Link href="/dashboard" className="min-w-[162px]">
@@ -237,18 +234,17 @@ const Header = ({
               <Loader2 className="animate-spin text-white font-bold w-6 h-6" />
             )}
 
-
             <MenuItems mobile={false} />
             <HeaderNav />
+            <UserProfile />
           </div>
 
           {/* Mobile Menu */}
           <div className="lg:hidden flex items-center gap-4">
             <HeaderNav />
-
+            <UserProfile />
           </div>
         </Wrapper>
-
       </div>
     </>
   );

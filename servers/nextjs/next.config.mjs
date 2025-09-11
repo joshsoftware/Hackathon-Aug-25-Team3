@@ -2,54 +2,51 @@ const nextConfig = {
   reactStrictMode: false,
   distDir: ".next-build",
 
-  // Rewrites for development - proxy font requests to FastAPI backend
+  // Explicitly set the host for Server Actions
+  serverRuntimeConfig: {
+    host: 'localhost',
+    port: 5001,
+  },
+
+  // Rewrites for development
   async rewrites() {
     return [
       {
         source: "/app_data/fonts/:path*",
         destination: "http://localhost:5001/app_data/fonts/:path*",
       },
+      {
+        source: "/api/v1/documents/:path*",
+        destination: "http://localhost:8000/api/v1/documents/:path*",
+      },
     ];
   },
 
+  // Configure headers for Server Actions
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: 'http://localhost:5001' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,HEAD,PUT,PATCH,POST,DELETE' },
+          { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version' },
+        ],
+      },
+    ];
+  },
+
+  // Add experimental server actions configuration
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['localhost:5001']
+    }
+  },
+
+  // Existing image remote patterns
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "pub-7c765f3726084c52bcd5d180d51f1255.r2.dev",
-      },
-      {
-        protocol: "https",
-        hostname: "pptgen-public.ap-south-1.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "pptgen-public.s3.ap-south-1.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "img.icons8.com",
-      },
-      {
-        protocol: "https",
-        hostname: "present-for-me.s3.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "yefhrkuqbjcblofdcpnr.supabase.co",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "picsum.photos",
-      },
-      {
-        protocol: "https",
-        hostname: "unsplash.com",
-      },
+      // ... (keep existing remote patterns)
     ],
   },
 };

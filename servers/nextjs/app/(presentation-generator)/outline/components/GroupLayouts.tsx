@@ -56,6 +56,10 @@ const GroupLayouts: React.FC<GroupLayoutsProps> = ({
               layoutId,
               groupName,
             } = layout;
+            
+            // Check if the layout component is an error component
+            const isErrorComponent = LayoutComponent?.displayName === "CustomTemplateErrorSlide";
+            
             return (
               <div
                 key={`${groupName}-${index}`}
@@ -63,7 +67,13 @@ const GroupLayouts: React.FC<GroupLayoutsProps> = ({
               >
                 <div className="absolute cursor-pointer bg-transparent z-40 top-0 left-0 w-full h-full" />
                 <div className="transform scale-[0.2] flex justify-center items-center origin-top-left  w-[500%] h-[500%]">
-                  <LayoutComponent data={sampleData} />
+                  {isErrorComponent ? (
+                    <div className="bg-gray-100 w-full h-full flex items-center justify-center text-gray-500">
+                      Layout Preview
+                    </div>
+                  ) : (
+                    <LayoutComponent data={sampleData} />
+                  )}
                 </div>
               </div>
             );

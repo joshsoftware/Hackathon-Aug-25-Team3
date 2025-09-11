@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { login, isAuthenticated } from "@/lib/auth";
+import { login, isAuthenticated, setAuthToken } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -36,11 +36,13 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await login({ email, password });
+      const resp=await login({ email, password });
       toast.success("Login successful!");
-
+      
+      console.log("Login response:", resp);
       // Redirect to the page they came from or dashboard
       const from = searchParams.get("from") || "/dashboard";
+      setAuthToken(resp?.access_token, resp.user?.is_admin);
       router.replace(from);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to login");
@@ -50,8 +52,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="container flex items-center justify-center">
-      <Card className="w-[400px]">
+    <div className="flex flex-1 items-center justify-center">
+      <Card className="">
         <CardHeader>
           <CardTitle>Login</CardTitle>
           <CardDescription>
