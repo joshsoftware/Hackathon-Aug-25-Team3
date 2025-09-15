@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 
 import { Card } from "@/components/ui/card";
-import { DashboardApi } from "@/app/(presentation-generator)/services/api/dashboard";
+import { dashboardApi } from "@/app/(presentation-generator)/services/api/dashboard";
 import { DotsVerticalIcon, TrashIcon } from "@radix-ui/react-icons";
 import {
   Popover,
@@ -37,7 +37,7 @@ export const PresentationCard = ({
     e.preventDefault();
     e.stopPropagation();
 
-    const response = await DashboardApi.deletePresentation(id);
+    const response = await dashboardApi.deletePresentation(id);
 
     if (response) {
       toast.success("Presentation deleted", {

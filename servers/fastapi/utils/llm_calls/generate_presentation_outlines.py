@@ -60,5 +60,6 @@ async def generate_ppt_outline(
         response_model.model_json_schema(),
         strict=True,
         tools=tools if client.enable_web_grounding() else None,
+        max_tokens=4096,  # Increased token limit
     ):
         yield chunk

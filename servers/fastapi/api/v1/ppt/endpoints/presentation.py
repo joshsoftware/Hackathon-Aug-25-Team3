@@ -6,8 +6,9 @@ from typing import Annotated, List, Literal, Optional
 from fastapi import APIRouter, Body, Depends, HTTPException
 from dependencies.auth import get_current_user_id
 from fastapi.responses import StreamingResponse
-from sqlalchemy import delete
+from sqlalchemy import delete, cast
 from sqlalchemy.ext.asyncio import AsyncSession
+# from sqlalchemy.dialects.postgresql import array, String, JSONB
 from sqlmodel import select
 from models.generate_presentation_request import GeneratePresentationRequest
 from models.presentation_and_path import PresentationPathAndEditPath
@@ -43,6 +44,8 @@ from utils.llm_calls.generate_slide_content import (
 )
 from utils.process_slides import process_slide_and_fetch_assets
 from utils.randomizers import get_random_uuid
+from models.sql.document_chunk import DocumentChunk
+from services.llm_client import LLMClient
 
 
 PRESENTATION_ROUTER = APIRouter(prefix="/presentation", tags=["Presentation"])
@@ -59,8 +62,8 @@ async def get_presentation(
         raise HTTPException(404, "Presentation not found")
     
     # Check if the presentation belongs to the current user
-    if presentation.user_id != user_id:
-        raise HTTPException(403, "You don't have permission to access this presentation")
+    if presentation.user_id != "josh-software":
+        raise HTTPException(403, "You don\'t have permission to access this presentation")
     slides = await sql_session.scalars(
         select(SlideModel)
         .where(SlideModel.presentation == id)
@@ -84,7 +87,7 @@ async def delete_presentation(
     
     # Check if the presentation belongs to the current user
     if presentation.user_id != user_id:
-        raise HTTPException(403, "You don't have permission to delete this presentation")
+        raise HTTPException(403, "You don\'t have permission to delete this presentation")
 
     await sql_session.execute(delete(SlideModel).where(SlideModel.presentation == id))
     await sql_session.delete(presentation)
@@ -98,8 +101,9 @@ async def get_all_presentations(
 ):
     presentations_with_slides = []
     presentations = await sql_session.scalars(
-        select(PresentationModel).where(PresentationModel.user_id == user_id)
+        select(PresentationModel).where(PresentationModel.user_id == 'josh-software')
     )
+    # presentations1 = presentations.all()  # now it's a list of PresentationModel objects
 
     async def inner(presentation: PresentationModel, sql_session: AsyncSession):
         first_slide = await sql_session.scalar(
@@ -107,6 +111,9 @@ async def get_all_presentations(
             .where(SlideModel.presentation == presentation.id)
             .where(SlideModel.index == 0)
         )
+        if first_slide:
+            print(first_slide.__dict__)
+
         if not first_slide:
             return None
         return PresentationWithSlides(
@@ -130,10 +137,11 @@ async def create_presentation(
     user_id: str = Depends(get_current_user_id),
 ):
     presentation_id = get_random_uuid()
+    user_id_to_use = "josh-software"
 
     presentation = PresentationModel(
         id=presentation_id,
-        user_id=user_id,  # Associate presentation with current user
+        user_id=user_id_to_use,  # Associate presentation with current user
         prompt=prompt,
         n_slides=n_slides,
         language=language,
@@ -163,8 +171,8 @@ async def prepare_presentation(
         raise HTTPException(status_code=404, detail="Presentation not found")
     
     # Check if the presentation belongs to the current user
-    if presentation.user_id != user_id:
-        raise HTTPException(403, "You don't have permission to prepare this presentation")
+    # if presentation.user_id != user_id:
+    #     raise HTTPException(403, "You don\'t have permission to prepare this presentation")
 
     presentation_outline_model = PresentationOutlineModel(slides=outlines)
 
@@ -300,6 +308,8 @@ async def update_presentation(
     sql_session: AsyncSession = Depends(get_async_session),
     user_id: str = Depends(get_current_user_id)
 ):
+    user_id_to_use = "josh-software"
+    # presentation_with_slides["user_id"] = user_id   
     updated_presentation = presentation_with_slides.to_presentation_model()
     updated_slides = presentation_with_slides.slides
     presentation = await sql_session.get(PresentationModel, updated_presentation.id)
@@ -307,8 +317,8 @@ async def update_presentation(
         raise HTTPException(status_code=404, detail="Presentation not found")
     
     # Check if the presentation belongs to the current user
-    if presentation.user_id != user_id:
-        raise HTTPException(403, "You don't have permission to update this presentation")
+    if presentation.user_id != user_id_to_use:
+        raise HTTPException(403, "You don\'t have permission to update this presentation")
     
     presentation.sqlmodel_update(updated_presentation)
 
@@ -343,27 +353,56 @@ async def create_pptx(
     return pptx_path
 
 
+from sqlalchemy import func
+from utils.llm_calls.get_relevant_tags import get_relevant_tags_from_prompt
+
+
 @PRESENTATION_ROUTER.post("/generate", response_model=PresentationPathAndEditPath)
 async def generate_presentation_api(
     request: GeneratePresentationRequest,
     sql_session: AsyncSession = Depends(get_async_session),
-    user_id: str = Depends(get_current_user_id),
 ):
+    user_id = "josh-software"
     presentation_id = get_random_uuid()
-
-    # 3. Generate Outlines
-    presentation_outlines = None
+    
+    # 1. Get relevant context from documents using AI-powered RAG
+    llm_client = LLMClient()
     additional_context = ""
 
-    if not presentation_outlines:
-        presentation_outlines_text = ""
-        async for chunk in generate_ppt_outline(
-            request.prompt,
-            request.n_slides,
-            request.language,
-            additional_context,
-        ):
-            presentation_outlines_text += chunk
+    # Step 1.1: Get all unique tags for the tenant
+    tags_result = await sql_session.execute(
+        select(func.array_agg(func.distinct(DocumentChunk.tags)))
+        .where(DocumentChunk.tenant_id == user_id)
+    )
+    # all_tags = [tag for sublist in tags_result.scalar_one_or_none() or [] for tag in sublist]
+
+    # Step 1.2: Use LLM to find relevant tags from the prompt
+    # relevant_tags = await get_relevant_tags_from_prompt(request.prompt, all_tags)
+
+    # Step 1.3: Perform vector search on chunks filtered by the relevant tags
+    prompt_embedding = await llm_client.generate_embeddings([request.prompt])
+    
+    query = select(DocumentChunk).where(DocumentChunk.tenant_id == user_id)
+
+    # Use all_tags directly for filtering
+    # if all_tags:
+    #     print(f"Filtering RAG search with tags: {all_tags}")
+    #     query = query.where(DocumentChunk.tags.op('?|')(cast(all_tags, JSONB)))
+
+    query = query.order_by(DocumentChunk.embedding.l2_distance(prompt_embedding[0])).limit(5)
+    
+    relevant_chunks = await sql_session.scalars(query)
+    additional_context = "\n\n".join([chunk.content for chunk in relevant_chunks])
+
+    # 2. Generate Outlines
+    presentation_outlines_text = ""
+    async for chunk in generate_ppt_outline(
+        request.prompt,
+        request.n_slides,
+        request.language,
+        additional_context, # Pass the retrieved context here
+    ):
+        presentation_outlines_text += chunk
 
     try:
         presentation_outlines_json = json.loads(presentation_outlines_text)
@@ -377,14 +416,12 @@ async def generate_presentation_api(
     outlines = presentation_outlines.slides[: request.n_slides]
     total_outlines = len(outlines)
 
-    print("-" * 40)
-    print(f"Generated {total_outlines} outlines for the presentation")
 
-    # 4. Parse Layouts
+    # 3. Parse Layouts
     layout_model = await get_layout_by_name(request.template)
     total_slide_layouts = len(layout_model.slides)
 
-    # 5. Generate Structure
+    # 4. Generate Structure
     if layout_model.ordered:
         presentation_structure = layout_model.to_presentation_structure()
     else:
@@ -404,7 +441,7 @@ async def generate_presentation_api(
         if presentation_structure.slides[index] >= total_slide_layouts:
             presentation_structure.slides[index] = random_slide_index
 
-    # 6. Create PresentationModel
+    # 5. Create PresentationModel
     presentation = PresentationModel(
         id=presentation_id,
         user_id=user_id,  # Associate presentation with current user
@@ -420,7 +457,7 @@ async def generate_presentation_api(
     icon_finder_service = IconFinderService()
     async_asset_generation_tasks = []
 
-    # 7. Generate slide content and save slides
+    # 6. Generate slide content and save slides
     slides: List[SlideModel] = []
     slide_contents: List[dict] = []
     for i, slide_layout_index in enumerate(presentation_structure.slides):
@@ -445,19 +482,16 @@ async def generate_presentation_api(
         )
         slides.append(slide)
         slide_contents.append(slide_content)
-
     generated_assets_lists = await asyncio.gather(*async_asset_generation_tasks)
     generated_assets = []
     for assets_list in generated_assets_lists:
         generated_assets.extend(assets_list)
-
-    # 8. Save PresentationModel and Slides
+    # 7. Save PresentationModel and Slides
     sql_session.add(presentation)
     sql_session.add_all(slides)
     sql_session.add_all(generated_assets)
     await sql_session.commit()
-
-    # 9. Export
+    # 8. Export
     presentation_and_path = await export_presentation(
         presentation_id, presentation.title or get_random_uuid(), request.export_as
     )
@@ -480,7 +514,7 @@ async def from_template(
     
     # Check if the presentation belongs to the current user
     if presentation.user_id != user_id:
-        raise HTTPException(403, "You don't have permission to use this presentation as a template")
+        raise HTTPException(403, "You don\'t have permission to use this presentation as a template")
     slides = await sql_session.scalars(
         select(SlideModel).where(SlideModel.presentation == data.presentation_id)
     )

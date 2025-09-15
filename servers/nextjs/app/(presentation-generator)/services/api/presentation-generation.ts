@@ -28,6 +28,41 @@ export class PresentationGenerationApi {
     }
   }
 
+  static async uploadDocuments(formData: FormData) {
+    try {
+      const response = await fetch(
+        `/api/v1/ppt/documents/upload`,
+        {
+          method: "POST",
+          headers: getHeaderForFormData(),
+          body: formData,
+          cache: "no-cache",
+        }
+      );
+      return await ApiResponseHandler.handleResponse(response, "Failed to upload documents to knowledge base");
+    } catch (error) {
+      console.error("Upload documents to knowledge base error:", error);
+      throw error;
+    }
+  }
+
+  static async listDocuments(): Promise<string[]> {
+    try {
+      const response = await fetch(
+        `/api/v1/ppt/documents`,
+        {
+          method: "GET",
+          headers: getHeader(),
+          cache: "no-cache",
+        }
+      );
+      return await ApiResponseHandler.handleResponse(response, "Failed to list documents");
+    } catch (error) {
+      console.error("List documents error:", error);
+      throw error;
+    }
+  }
+
   static async decomposeDocuments(documentKeys: string[]) {
     try {
       const response = await fetch(
@@ -54,15 +89,17 @@ export class PresentationGenerationApi {
     n_slides,
     file_paths,
     language,
+    source_document_id,
   }: {
     prompt: string;
     n_slides: number | null;
     file_paths?: string[];
     language: string | null;
+    source_document_id?: string | null;
   }) {
     try {
       const response = await fetch(
-        `/api/v1/ppt/presentation/create`,
+        `/api/v1/ppt/presentation/generate`,
         {
           method: "POST",
           headers: getHeader(),
@@ -71,6 +108,7 @@ export class PresentationGenerationApi {
             n_slides,
             file_paths,
             language,
+            source_document_id,
           }),
           cache: "no-cache",
         }

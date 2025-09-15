@@ -1,9 +1,12 @@
 import { api } from "@/lib/api";
+import { ApiResponseHandler } from "./api-error-handler";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
-
+// const isBrowser = typeof window !== "undefined";
+// const API_BASE_URL = isBrowser ? "http://localhost:5001" : "http://localhost:80";
+// const API_BASE_URL =  "http://localhost:80"; 
+const API_BASE_URL = "";   
 export interface PresentationResponse {
-  id: string;
+id: string;
   title: string;
   description: string;
   status: string;
@@ -42,12 +45,11 @@ export const dashboardApi = {
       const response = await api.get(
         `${API_BASE_URL}/api/v1/ppt/presentation?id=${id}`
       );
-
       if (!response.ok) {
         throw new Error("Presentation not found");
       }
 
-      return response.json();
+      return await ApiResponseHandler.handleResponse(response, "Presentation not found");
     } catch (error) {
       console.error("Error fetching presentation:", error);
       throw error;

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 
 import Wrapper from "@/components/Wrapper";
-import { DashboardApi } from "@/app/(presentation-generator)/services/api/dashboard";
+import { dashboardApi } from "@/app/(presentation-generator)/services/api/dashboard";
 import { PresentationGrid } from "@/app/(presentation-generator)/dashboard/components/PresentationGrid";
 
 import Header from "@/app/(presentation-generator)/dashboard/components/Header";
@@ -24,7 +24,7 @@ const DashboardPage: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await DashboardApi.getPresentations();
+      const data = await dashboardApi.getPresentations();
       data.sort(
         (a: any, b: any) =>
           new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()

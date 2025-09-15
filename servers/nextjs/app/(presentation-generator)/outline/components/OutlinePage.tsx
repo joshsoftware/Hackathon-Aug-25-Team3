@@ -21,6 +21,7 @@ const OutlinePage: React.FC = () => {
     (state: RootState) => state.presentationGeneration
   );
 
+
   const [activeTab, setActiveTab] = useState<string>(TABS.OUTLINE);
   const [selectedLayoutGroup, setSelectedLayoutGroup] = useState<LayoutGroup | null>(null);
   // Custom hooks
@@ -32,6 +33,7 @@ const OutlinePage: React.FC = () => {
     selectedLayoutGroup,
     setActiveTab
   );
+
   if (!presentation_id) {
     return <EmptyStateView />;
   }

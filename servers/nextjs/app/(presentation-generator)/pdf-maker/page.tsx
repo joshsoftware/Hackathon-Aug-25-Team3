@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import PdfMakerPage from "./PdfMakerPage";
 const page = () => {
-
     const router = useRouter();
     const params = useSearchParams();
     const queryId = params.get("id");

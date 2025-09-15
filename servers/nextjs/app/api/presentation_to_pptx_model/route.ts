@@ -30,9 +30,9 @@ export async function GET(request: NextRequest) {
     const id = await getPresentationId(request);
     [browser, page] = await getBrowserAndPage(id);
     const screenshotsDir = getScreenshotsDir();
-
     const { slides, speakerNotes } = await getSlidesAndSpeakerNotes(page);
-    const slides_attributes = await getSlidesAttributes(slides, screenshotsDir);
+    const slidesArray = slides ? (Array.isArray(slides) ? slides : [slides]) : [];
+    const slides_attributes = await getSlidesAttributes(slidesArray, screenshotsDir);
     await postProcessSlidesAttributes(slides_attributes, screenshotsDir, speakerNotes);
     const slides_pptx_models = convertElementAttributesToPptxSlides(slides_attributes);
     const presentation_pptx_model: PptxPresentationModel = {
@@ -71,8 +71,10 @@ async function getBrowserAndPage(id: string): Promise<[Browser, Page]> {
       '--disable-web-security',
     ],
   });
-
   const page = await browser.newPage();
+
+  // Add this to listen to the browser's console
+  page.on('console', msg => console.log('PAGE LOG:', msg.text()));
 
   await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 1 });
   page.setDefaultNavigationTimeout(300000);
@@ -81,6 +83,23 @@ async function getBrowserAndPage(id: string): Promise<[Browser, Page]> {
     waitUntil: "networkidle0",
     timeout: 300000,
   });
+
+  try {
+    await page.waitForSelector('body.page-loaded, [role="alert"]', { timeout: 300000 });
+  } catch (e) {
+    const pageContent = await page.content();
+    console.error("Timeout waiting for page to load. Page content:", pageContent);
+    throw new ApiError("Timeout waiting for page to load. The page did not signal success or error within the time limit.");
+  }
+
+
+  const errorElement = await page.$('[role="alert"]');
+  if (errorElement) {
+    const errorText = await errorElement.evaluate(el => el.textContent);
+    console.error(`Error alert found on page: ${errorText}`);
+    throw new ApiError(`Failed to load presentation page: an error alert was displayed: ${errorText}`);
+  }
+
   return [browser, page];
 }
 
@@ -196,16 +215,16 @@ async function getSlidesAttributes(slides: ElementHandle<Element>[], screenshots
   return slideAttributes;
 }
 
-
 async function getSlidesAndSpeakerNotes(page: Page) {
   const slides_wrapper = await getSlidesWrapper(page);
   const speakerNotes = await getSpeakerNotes(slides_wrapper);
-  const slides = await slides_wrapper.$$(":scope > div > div");
+  const slides = await slides_wrapper.$(":scope > div > div");
   return { slides, speakerNotes };
 }
 
 async function getSlidesWrapper(page: Page): Promise<ElementHandle<Element>> {
   const slides_wrapper = await page.$("#presentation-slides-wrapper");
+  console.log("slides_wrapper:", slides_wrapper); // Add this line
   if (!slides_wrapper) {
     throw new ApiError("Presentation slides not found");
   }
@@ -411,7 +430,7 @@ async function getElementAttributes(element: ElementHandle<Element>): Promise<El
 
           if (parts.length >= 4) {
             const opacity = parseFloat(parts[3]);
-            const rgbColor = color.replace(/rgba?\(|hsla?\(|\)/g, '').split(',').slice(0, 3).join(',');
+            const rgbColor = color.replace(/rgba?|(?:hsla?)\(|\)/g, '').split(',').slice(0, 3).join(',');
             const rgbString = color.startsWith('rgba') ? `rgb(${rgbColor})` : `hsl(${rgbColor})`;
 
             const canvas = document.createElement('canvas');
@@ -504,7 +523,7 @@ async function getElementAttributes(element: ElementHandle<Element>): Promise<El
       }
 
       // Extract URL from background-image style
-      const urlMatch = backgroundImage.match(/url\(['"]?([^'"]+)['"]?\)/);
+      const urlMatch = backgroundImage.match(/url\(['"]?([^'" ]+?)['"]?\)/);
       if (urlMatch && urlMatch[1]) {
         return urlMatch[1];
       }
@@ -961,7 +980,19 @@ async function getElementAttributes(element: ElementHandle<Element>): Promise<El
       const objectFit = computedStyles.objectFit as 'contain' | 'cover' | 'fill' | undefined;
 
       const parsedBackgroundImage = parseBackgroundImage(computedStyles);
-      const imageSrc = (el as HTMLImageElement).src || parsedBackgroundImage;
+      let imageSrc = (el as HTMLImageElement).src || parsedBackgroundImage;
+
+      if (el.tagName.toLowerCase() === 'img' && el.getAttribute('src') === '') {
+        imageSrc = undefined;
+      }
+
+      if (imageSrc && imageSrc.includes('pdf-maker')) {
+        console.log('Suspicious imageSrc found:', imageSrc);
+        console.log('Element outerHTML:', el.outerHTML);
+        console.log('Element tagName:', el.tagName);
+        console.log('Element id:', el.id);
+        console.log('Element className:', el.className);
+      }
 
       const borderRadiusValue = parseBorderRadius(computedStyles, el);
 

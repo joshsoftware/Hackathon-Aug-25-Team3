@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // Define paths that don't require authentication
-const publicPaths = ["/login", "/signup"];
+const publicPaths = ["/login", "/signup", "/api/layout", "/schema", "/api/presentation_to_pptx_model", "/pdf-maker"];
 
 // Define paths that are only accessible when NOT authenticated
 const authOnlyPaths = ["/login", "/signup"];

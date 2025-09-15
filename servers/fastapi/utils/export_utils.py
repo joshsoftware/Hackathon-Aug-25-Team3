@@ -17,12 +17,12 @@ async def export_presentation(
     presentation_id: str, title: str, export_as: Literal["pptx", "pdf"]
 ) -> PresentationAndPath:
     if export_as == "pptx":
-
         # Get the converted PPTX model from the Next.js service
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 f"http://localhost/api/presentation_to_pptx_model?id={presentation_id}"
             ) as response:
+                print(await response.text())
                 if response.status != 200:
                     error_text = await response.text()
                     print(f"Failed to get PPTX model: {error_text}")

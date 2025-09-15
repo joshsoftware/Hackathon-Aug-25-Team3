@@ -69,9 +69,12 @@ async def stream_outlines(
 
                 presentation_outlines_text += chunk
 
+            print(f"LLM Raw Output: {presentation_outlines_text}") # Added print statement
+
             try:
                 presentation_outlines_json = json.loads(presentation_outlines_text)
             except Exception as e:
+                print(f"JSON parsing error: {e}") # Added print statement
                 raise HTTPException(
                     status_code=400,
                     detail="Failed to generate presentation outlines. Please try again.",
@@ -91,7 +94,7 @@ async def stream_outlines(
             .content[:50]
             .replace("#", "")
             .replace("/", "")
-            .replace("\\", "")
+            .replace("\\\\", "")
             .replace("\n", "")
         )
 

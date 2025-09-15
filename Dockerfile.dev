@@ -6,7 +6,43 @@ RUN apt-get update && apt-get install -y \
   curl \
   libreoffice \
   fontconfig \
-  imagemagick
+  imagemagick \
+  ca-certificates \
+  fonts-liberation \
+  libasound2 \
+  libatk-bridge2.0-0 \
+  libatk1.0-0 \
+  libc6 \
+  libcairo2 \
+  libcups2 \
+  libdbus-1-3 \
+  libexpat1 \
+  libfontconfig1 \
+  libgbm1 \
+  libgcc1 \
+  libglib2.0-0 \
+  libgtk-3-0 \
+  libnspr4 \
+  libnss3 \
+  libpango-1.0-0 \
+  libpangocairo-1.0-0 \
+  libstdc++6 \
+  libx11-6 \
+  libx11-xcb1 \
+  libxcb1 \
+  libxcomposite1 \
+  libxcursor1 \
+  libxdamage1 \
+  libxext6 \
+  libxfixes3 \
+  libxi6 \
+  libxrandr2 \
+  libxrender1 \
+  libxss1 \
+  libxtst6 \
+  lsb-release \
+  wget \
+  xdg-utils
 
 RUN sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml
 
@@ -31,10 +67,10 @@ RUN curl -fsSL http://ollama.com/install.sh | sh
 
 # Install dependencies for FastAPI
 RUN pip install aiohttp aiomysql aiosqlite asyncpg fastapi[standard] \
-  pathvalidate pdfplumber chromadb sqlmodel \
+  pathvalidate pdfplumber chromadb sqlmodel pgvector \
   anthropic google-genai openai fastmcp \
-  python-jose[cryptography] passlib
-RUN pip install docling --extra-index-url https://download.pytorch.org/whl/cpu
+  python-jose[cryptography] passlib numpy onnxruntime transformers
+RUN pip install docling --find-links https://download.pytorch.org/whl/cpu
 
 # Install dependencies for Next.js
 WORKDIR /node_dependencies
