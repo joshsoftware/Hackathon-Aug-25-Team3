@@ -5,11 +5,9 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import PdfMakerPage from "./PdfMakerPage";
 const page = () => {
-    console.log("Rendering pdf-maker/page.tsx");
     const router = useRouter();
     const params = useSearchParams();
     const queryId = params.get("id");
-    console.log("----------------------------------------------id:",queryId);
     if (!queryId) {
         return (
             <div className="flex flex-col items-center justify-center h-screen">

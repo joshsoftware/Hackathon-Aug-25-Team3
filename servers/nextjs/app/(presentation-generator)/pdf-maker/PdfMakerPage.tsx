@@ -56,9 +56,7 @@ const PresentationPage = ({ presentation_id }: { presentation_id: string }) => {
   // Function to fetch the user slides
   const fetchUserSlides = async () => {
     try {
-      console.log("before Fetched presentation data:-----------------------------",presentation_id);
       const data = await dashboardApi.getPresentation(presentation_id);
-      console.log("Fetched presentation data:-----------------------------", data);
       dispatch(setPresentationData(data));
       setContentLoading(false);
       document.body.classList.add('page-loaded');

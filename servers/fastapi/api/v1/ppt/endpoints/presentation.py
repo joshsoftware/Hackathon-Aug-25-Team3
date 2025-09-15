@@ -99,13 +99,11 @@ async def get_all_presentations(
     sql_session: AsyncSession = Depends(get_async_session),
     user_id: str = Depends(get_current_user_id)
 ):
-    print(user_id)
     presentations_with_slides = []
     presentations = await sql_session.scalars(
         select(PresentationModel).where(PresentationModel.user_id == 'josh-software')
     )
     # presentations1 = presentations.all()  # now it's a list of PresentationModel objects
-    # print(presentations1) 
 
     async def inner(presentation: PresentationModel, sql_session: AsyncSession):
         first_slide = await sql_session.scalar(
@@ -310,7 +308,6 @@ async def update_presentation(
     sql_session: AsyncSession = Depends(get_async_session),
     user_id: str = Depends(get_current_user_id)
 ):
-    print(f"user-------------------------------------: {user_id}")
     user_id_to_use = "josh-software"
     # presentation_with_slides["user_id"] = user_id   
     updated_presentation = presentation_with_slides.to_presentation_model()
@@ -409,7 +406,6 @@ async def generate_presentation_api(
 
     try:
         presentation_outlines_json = json.loads(presentation_outlines_text)
-        print("presentation_outlines_json",presentation_outlines_json)
     except Exception as e:
         print(e)
         raise HTTPException(
@@ -420,8 +416,6 @@ async def generate_presentation_api(
     outlines = presentation_outlines.slides[: request.n_slides]
     total_outlines = len(outlines)
 
-    print("-" * 40)
-    print(f"Generated {total_outlines} outlines for the presentation")
 
     # 3. Parse Layouts
     layout_model = await get_layout_by_name(request.template)
@@ -466,7 +460,6 @@ async def generate_presentation_api(
     # 6. Generate slide content and save slides
     slides: List[SlideModel] = []
     slide_contents: List[dict] = []
-    print("doola")
     for i, slide_layout_index in enumerate(presentation_structure.slides):
         slide_layout = layout_model.slides[slide_layout_index]
         print(f"Generating content for slide {i} with layout {slide_layout.id}")
@@ -489,24 +482,20 @@ async def generate_presentation_api(
         )
         slides.append(slide)
         slide_contents.append(slide_content)
-    print("hoola")
     generated_assets_lists = await asyncio.gather(*async_asset_generation_tasks)
     generated_assets = []
     for assets_list in generated_assets_lists:
         generated_assets.extend(assets_list)
-    print("boola")
     # 7. Save PresentationModel and Slides
     sql_session.add(presentation)
     sql_session.add_all(slides)
     sql_session.add_all(generated_assets)
     await sql_session.commit()
-    print("choola")
     # 8. Export
-    print(presentation_id,presentation.title,get_random_uuid(),request.export_as,user_id)
     presentation_and_path = await export_presentation(
         presentation_id, presentation.title or get_random_uuid(), request.export_as
     )
-    print("toola")
+
     return PresentationPathAndEditPath(
         **presentation_and_path.model_dump(),
         edit_path=f"/presentation?id={presentation_id}",

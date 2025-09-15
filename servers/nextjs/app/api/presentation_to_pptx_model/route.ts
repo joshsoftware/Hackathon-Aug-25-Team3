@@ -28,19 +28,13 @@ export async function GET(request: NextRequest) {
 
   try {
     const id = await getPresentationId(request);
-    console.log("a---------------------1",id);
     [browser, page] = await getBrowserAndPage(id);
-    console.log("a---------------------2",browser,page);
     const screenshotsDir = getScreenshotsDir();
-    console.log("a---------------------3",screenshotsDir);
     const { slides, speakerNotes } = await getSlidesAndSpeakerNotes(page);
-    console.log("a---------------------4",slides,speakerNotes);
     const slidesArray = slides ? (Array.isArray(slides) ? slides : [slides]) : [];
     const slides_attributes = await getSlidesAttributes(slidesArray, screenshotsDir);
-    console.log("a---------------------5",slides_attributes);
     await postProcessSlidesAttributes(slides_attributes, screenshotsDir, speakerNotes);
     const slides_pptx_models = convertElementAttributesToPptxSlides(slides_attributes);
-    console.log("=========",slides_pptx_models);
     const presentation_pptx_model: PptxPresentationModel = {
       slides: slides_pptx_models,
     };
@@ -77,7 +71,6 @@ async function getBrowserAndPage(id: string): Promise<[Browser, Page]> {
       '--disable-web-security',
     ],
   });
-  console.log('-------------=================================================----',browser)
   const page = await browser.newPage();
 
   // Add this to listen to the browser's console

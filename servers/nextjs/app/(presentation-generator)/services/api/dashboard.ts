@@ -41,14 +41,10 @@ export const dashboardApi = {
   },
 
   getPresentation: async (id: string): Promise<PresentationResponse> => {
-    console.log("Fetching presentation befor try id:##############################", id);
-    console.log(`${API_BASE_URL}/api/v1/ppt/presentation?id=${id}`);
     try {
       const response = await api.get(
         `${API_BASE_URL}/api/v1/ppt/presentation?id=${id}`
       );
-      console.log(`${API_BASE_URL}/api/v1/ppt/presentation?id=${id}`);
-      console.log("Response from getPresentation:##############################", response);
       if (!response.ok) {
         throw new Error("Presentation not found");
       }
